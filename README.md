@@ -51,35 +51,31 @@ metadata:
   title: サンプル
 ```
 
-複数の DOCX を生成する場合は matrix で呼び出す。
+複数の DOCX を生成する場合は job を分けて呼び出す。
 
 ```yaml
 jobs:
-  build:
-    strategy:
-      fail-fast: false
-      matrix:
-        target:
-          - name: with-toc
-            input_folder: sample
-            output_file: dist/with-toc.docx
-            config: defaults.yml
-          - name: no-toc
-            input_folder: sample
-
+  with-toc:
     uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@v1
     with:
-      name: ${{ matrix.target.name }}
-      input_folder: ${{ matrix.target.input_folder }}
-      output_file: ${{ matrix.target.output_file }}
-      config: ${{ matrix.target.config }}
+      name: with-toc
+      input_folder: sample
+      output_file: dist/with-toc.docx
+      config: defaults.yml
+      shared_ref: v1
+
+  no-toc:
+    uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@v1
+    with:
+      name: no-toc
+      input_folder: sample
       shared_ref: v1
 ```
 
 `output_file` を省略すると `dist/<input_folder の basename>.docx` に出力する。
 生成物は `<caller ref>_pandoc-<name>` ブランチへ publish される。
 
-テスト用 workflow は `.github/workflows/_*-docx.yml` に置いている。
+テスト用 workflow は `.github/workflows/_sample.yml` に置いている。
 
 ## ローカルで使う
 
