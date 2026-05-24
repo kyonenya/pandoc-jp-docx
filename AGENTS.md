@@ -15,7 +15,7 @@
 ## スクリプトの役割
 
 - `build-pandoc.sh` はローカルと GitHub Actions の共通処理である。Pandoc 実行、既定 `output_file` の解決、`GITHUB_OUTPUT` への出力をここに集約する。
-- `build.sh` はローカル用ラッパーである。`build-pandoc.sh` を呼び、その後 `postprocess-numbering.sh` を実行する。
+- `build.sh` はローカル用ラッパーである。`build-pandoc.sh` を呼び、その後 `postprocess/numbering.sh` を実行する。
 - 引数順はどちらも `input_folder [config] [output_file]` である。`config` を渡しやすくするため、`output_file` は第3引数である。
 - workflow 側で出力パス解決を重複実装しない。必要な既定値処理は `build-pandoc.sh` に寄せる。
 

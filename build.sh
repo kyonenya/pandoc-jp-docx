@@ -10,4 +10,4 @@ trap 'rm -f "$tmp"' EXIT
 
 GITHUB_OUTPUT="$tmp" sh build-pandoc.sh "$input_folder" "$config" "$output_file"
 output_file=$(sed -n 's/^output_file=//p' "$tmp")
-./postprocess-numbering.sh "$output_file"
+./postprocess/numbering.sh "$output_file"
