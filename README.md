@@ -51,6 +51,17 @@ metadata:
   title: サンプル
 ```
 
+呼び出し側リポジトリの `reference.docx` を使う場合は、呼び出し側の
+defaults で `reference-doc` を指定する。相対パスを defaults ファイル基準で
+解決するため、`${.}` を使う。
+
+```yaml
+reference-doc: ${.}/reference.docx
+```
+
+`reference-doc: reference.docx` と書くと、実行ディレクトリ基準で共有側の
+`reference.docx` が参照される場合がある。
+
 複数の DOCX を生成する場合は job を分けて呼び出す。
 
 ```yaml
