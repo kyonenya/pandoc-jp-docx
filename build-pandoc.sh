@@ -3,27 +3,19 @@ set -eu
 
 input_folder=${1:?Usage: $0 input_folder [config] [output_file]}
 config=${2:-}
-output_file=${3:-}
+output_file=${3:-"dist/$(basename "$input_folder").docx"}
 
-if [ -z "$output_file" ]; then
-  case "$input_folder" in
-    caller/*)
-      output_file="caller/dist/$(basename "$input_folder").docx"
-      ;;
-    *)
-      output_file="dist/$(basename "$input_folder").docx"
-      ;;
-  esac
+if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
+  input_folder="caller/$input_folder"
+  config=${config:+"caller/$config"}
+  output_file="caller/$output_file"
 fi
 
 mkdir -p "$(dirname "$output_file")"
 
-set -- --defaults=defaults.yml
-if [ -n "$config" ]; then
-  set -- "$@" --defaults="$config"
-fi
-
-pandoc "$@" \
+pandoc \
+  --defaults=defaults.yml \
+  ${config:+--defaults="$config"} \
   --output="$output_file" \
   "$input_folder"/[0-9]*.md
 
