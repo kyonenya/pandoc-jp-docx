@@ -63,7 +63,7 @@ jobs:
           node-version: 24
 
       - name: Postprocess DOCX numbering
-        run: ./postprocess-numbering.sh "${{ steps.pandoc.outputs.output_file }}"
+        run: ./postprocess/numbering.sh "${{ steps.pandoc.outputs.output_file }}"
 
       - name: Publish DOCX
         uses: peaceiris/actions-gh-pages@v4.1.0

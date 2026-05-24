@@ -1,6 +1,6 @@
 # Word のリスト (箇条書き / 番号付き) インデント対応の調査ノート
 
-`postprocess-numbering.sh` / `postprocess/numbering.mts` の背景。
+`postprocess/numbering.sh` / `postprocess/numbering.mts` の背景。
 
 ## 解決したい問題
 

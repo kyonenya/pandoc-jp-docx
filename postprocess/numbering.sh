@@ -14,10 +14,10 @@ mkdir -p "$tmp/word"
 # numbering.xml を持たないドキュメント (リスト無し) はスキップ
 if ! unzip -p "$docx_abs" word/numbering.xml > "$tmp/word/numbering.xml" 2>/dev/null \
    || [ ! -s "$tmp/word/numbering.xml" ]; then
-  echo "skipped postprocess-numbering: no numbering.xml"
+  echo "skipped postprocess: no numbering.xml"
   exit 0
 fi
 
-node "$script_dir/postprocess/numbering.mts" "$tmp/word/numbering.xml"
+node "$script_dir/numbering.mts" "$tmp/word/numbering.xml"
 
 (cd "$tmp" && zip -q "$docx_abs" word/numbering.xml)
