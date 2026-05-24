@@ -8,7 +8,7 @@
 ## このリポジトリの構成
 
 - 公開 reusable workflow は `.github/workflows/docx.yml` である。
-- リポジトリ内検証 workflow は `.github/workflows/_single-docx.yml` と `.github/workflows/_matrix-docx.yml` である。
+- リポジトリ内検証 workflow は `.github/workflows/_sample.yml` である。
 - shared 側の Pandoc defaults はルートの `defaults.yml` である。`defaults/docx.yml` は使わない。
 - fixture 入力は `sample/` に置く。変換対象 Markdown は `[0-9]*.md` である。
 
