@@ -84,7 +84,11 @@ function transformAbstractNumXML(s: string): string {
     if (!body) continue;
     s = s.replace(
       abstractNumPartsRegex(absId),
-      (_match, open, _oldBody, close) => open + body + close,
+      (_match, open, _oldBody, close) => {
+        if (absId === '991') console.log('postprocess: 箇条書きリスト');
+        if (absId === '99411') console.log('postprocess: 番号付きリスト');
+        return open + body + close;
+      },
     );
   }
 
