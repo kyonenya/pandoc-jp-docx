@@ -50,9 +50,9 @@ jobs:
           entrypoint: /bin/sh
           args: >-
             build-pandoc.sh
-            caller/${{ inputs.input_folder }}
-            ${{ inputs.config && format('caller/{0}', inputs.config) || '' }}
-            ${{ inputs.output_file && format('caller/{0}', inputs.output_file) || '' }}
+            "${{ inputs.input_folder }}"
+            "${{ inputs.config }}"
+            "${{ inputs.output_file }}"
 
       - name: Fix generated file ownership
         run: sudo chown -R "$USER:$USER" "${{ steps.pandoc.outputs.publish_dir }}"
