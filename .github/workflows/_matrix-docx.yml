@@ -2,9 +2,11 @@ name: Build Matrix DOCX
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
+    branches-ignore:
+      - '**'
+    # branches:
+    # - dev
+  # pull_request:
 
 permissions:
   contents: write
@@ -22,10 +24,10 @@ jobs:
           - name: no-toc
             input_folder: sample
 
-    uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@main
+    uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@dev
     with:
       name: ${{ matrix.target.name }}
       input_folder: ${{ matrix.target.input_folder }}
       output_file: ${{ matrix.target.output_file }}
       config: ${{ matrix.target.config }}
-      shared_ref: main
+      shared_ref: dev
