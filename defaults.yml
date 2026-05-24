@@ -1,0 +1,9 @@
+standalone: true
+to: docx
+reference-doc: reference.docx
+filters:
+  - filters/boten.lua
+  - filters/ruby.lua
+  - filters/width.lua
+  - filters/page-break.lua
+  - filters/section-break.lua

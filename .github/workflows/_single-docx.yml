@@ -1,0 +1,27 @@
+name: Build Single DOCX
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  with-toc:
+    uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@main
+    with:
+      name: single-with-toc
+      input_folder: sample
+      output_file: dist/single-with-toc.docx
+      config: sample/defaults.yml
+      shared_ref: main
+
+  defaults-only:
+    uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@main
+    with:
+      name: single-defaults-only
+      input_folder: sample
+      shared_ref: main

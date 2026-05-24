@@ -1,2 +1,99 @@
 # pandoc-ja-docx
-日本語組版向けPandoc Word変換共通ワークフロー
+
+ルビ・傍点・セクション区切りなどに対応した、日本語組版向けPandoc Word変換共通ワークフロー
+
+## GitHub Actions で使う
+
+呼び出し側のリポジトリでは、Markdown をフォルダに置く。変換対象は
+`input_folder` 内の `[0-9]*.md` である。
+このリポジトリ側の共通設定は `defaults.yml` にあり、呼び出し側の `config`
+に指定した Pandoc defaults と実行時にマージする。
+
+```yaml
+name: Build Single DOCX
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@v1
+    with:
+      input_folder: sample
+      output_file: dist/single-with-toc.docx
+      config: defaults.yml
+      shared_ref: v1
+      name: single-with-toc
+```
+
+`output_file` と `config` は省略できる。
+
+```yaml
+jobs:
+  build:
+    uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@v1
+    with:
+      input_folder: sample
+      shared_ref: v1
+```
+
+`config` は Pandoc の defaults ファイルである。省略できる。
+
+```yaml
+toc: true
+number-sections: true
+metadata:
+  title: サンプル
+```
+
+複数の DOCX を生成する場合は matrix で呼び出す。
+
+```yaml
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - name: with-toc
+            input_folder: sample
+            output_file: dist/with-toc.docx
+            config: defaults.yml
+          - name: no-toc
+            input_folder: sample
+
+    uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@v1
+    with:
+      name: ${{ matrix.target.name }}
+      input_folder: ${{ matrix.target.input_folder }}
+      output_file: ${{ matrix.target.output_file }}
+      config: ${{ matrix.target.config }}
+      shared_ref: v1
+```
+
+`output_file` を省略すると `dist/<input_folder の basename>.docx` に出力する。
+生成物は `<caller ref>_pandoc-<name>` ブランチへ publish される。
+
+テスト用 workflow は `.github/workflows/_*-docx.yml` に置いている。
+
+## ローカルで使う
+
+ローカルでは後処理込みの `build.sh` を使う。
+
+```sh
+./build.sh sample
+```
+
+caller defaults と任意の出力先を渡すこともできる。
+
+```sh
+./build.sh sample sample/defaults.yml dist/with-toc.docx
+```
+
+Pandoc 変換部分は `build-pandoc.sh` に集約している。このスクリプトは
+ローカル用 `build.sh` と GitHub Actions の両方から呼び出す。

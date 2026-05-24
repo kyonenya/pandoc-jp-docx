@@ -1,0 +1,4 @@
+[tools]
+actionlint = "latest"
+node = "24.16.0"
+pnpm = "11"

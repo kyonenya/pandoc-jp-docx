@@ -1,0 +1,5 @@
+{
+  "Lua.runtime.version": "Lua 5.4",
+  "Lua.diagnostics.globals": ["pandoc", "PANDOC_VERSION", "FORMAT"],
+  "Lua.diagnostics.disable": ["undefined-doc-name"]
+}
