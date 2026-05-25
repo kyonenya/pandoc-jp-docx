@@ -1,14 +1,19 @@
--- フェンス付き div を Word のセクション区切りに変換する
+-- フェンス付き div を Word の改ページまたはセクション区切りに変換する
+-- ::: {.page-break} ::: → 改ページ
 -- ::: {.section-break type="nextPage"} ::: → 次ページからの区切り
 -- ::: {.section-break type="oddPage"} :::  → 奇数ページからの区切り
 -- ::: {.section-break type="evenPage"} ::: → 偶数ページからの区切り
 
--- reference.docx の末尾 sectPr の値に依存するため、以下のコマンドで取得してコピペする
--- unzip -p reference.docx word/document.xml | grep -oE '<w:sectPr[^/]*?(/>|.*?</w:sectPr>)' | tail -1
-
 function Div(elem)
   if FORMAT ~= 'docx' then return nil end
 
+  if elem.classes:includes('page-break') then
+    local xml = '<w:p><w:r><w:br w:type="page"/></w:r></w:p>'
+    return pandoc.RawBlock('openxml', xml)
+  end
+
+  -- reference.docx の末尾 sectPr の値に依存するため、以下のコマンドで取得してコピペする
+  -- unzip -p reference.docx word/document.xml | grep -oE '<w:sectPr[^/]*?(/>|.*?</w:sectPr>)' | tail -1
   if elem.classes:includes('section-break') then
     local break_type = elem.attributes['type']
     local xml = string.format(
