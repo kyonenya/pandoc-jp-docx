@@ -25,13 +25,13 @@ jobs:
     uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@v1
     with:
       input_folder: sample
-      output_file: dist/single-with-toc.docx
+      output_name: single-with-toc
       config: defaults.yml
       shared_ref: v1
-      name: single-with-toc
 ```
 
-`output_file` は必須である。`config` は省略できる。
+`output_name` は必須である。生成先は `dist/<output_name>.docx` である。
+`config` は省略できる。
 
 ```yaml
 jobs:
@@ -39,7 +39,7 @@ jobs:
     uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@v1
     with:
       input_folder: sample
-      output_file: dist/sample.docx
+      output_name: sample
       shared_ref: v1
 ```
 
@@ -70,18 +70,16 @@ jobs:
   with-toc:
     uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@v1
     with:
-      name: with-toc
       input_folder: sample
-      output_file: dist/with-toc.docx
+      output_name: with-toc
       config: defaults.yml
       shared_ref: v1
 
   no-toc:
     uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@v1
     with:
-      name: no-toc
       input_folder: sample
-      output_file: dist/no-toc.docx
+      output_name: no-toc
       shared_ref: v1
 ```
 
@@ -94,13 +92,13 @@ jobs:
 ローカルでは後処理込みの `build.sh` を使う。
 
 ```sh
-./build.sh sample dist/sample.docx
+./build.sh sample sample
 ```
 
-caller defaults と任意の出力先を渡すこともできる。
+caller defaults を渡すこともできる。
 
 ```sh
-./build.sh sample dist/with-toc.docx sample/defaults.yml
+./build.sh sample with-toc sample/defaults.yml
 ```
 
 Pandoc 変換部分は `build-pandoc.sh` に集約している。このスクリプトは

@@ -13,16 +13,14 @@ jobs:
   with-toc:
     uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@dev
     with:
-      name: single-with-toc
       input_folder: sample
-      output_file: dist/single-with-toc.docx
+      output_name: single-with-toc
       config: sample/defaults.yml
       shared_ref: dev
 
   defaults-only:
     uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@dev
     with:
-      name: single-defaults-only
       input_folder: sample
-      output_file: dist/single-defaults-only.docx
+      output_name: single-defaults-only
       shared_ref: dev
