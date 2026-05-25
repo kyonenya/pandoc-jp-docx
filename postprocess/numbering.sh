@@ -1,23 +1,23 @@
 #!/bin/sh
-# pandoc が生成した docx の numbering.xml を後処理で書き換える
+# pandoc が生成した docx の word/numbering.xml を後処理で書き換える
 set -eu
 
-docx=${1:?Usage: $0 path/to/file.docx}
-docx_dir=$(cd "$(dirname "$docx")" && pwd -P)
-docx_abs="$docx_dir/$(basename "$docx")"
-script_dir=$(cd "$(dirname "$0")" && pwd)
+input_path=${1:?Usage: $0 path/to/file.docx}
+input_dir=$(dirname "$input_path")
+input_file=$(basename "$input_path")
+script_dir=$(dirname "$0")
 
-tmp=$(mktemp -d)
+tmp=$(mktemp -d "$input_dir/.tmp.XXXXXX")
 trap 'rm -rf "$tmp"' EXIT
 mkdir -p "$tmp/word"
 
-# numbering.xml を持たないドキュメント (リスト無し) はスキップ
-if ! unzip -p "$docx_abs" word/numbering.xml > "$tmp/word/numbering.xml" 2>/dev/null \
-   || [ ! -s "$tmp/word/numbering.xml" ]; then
+numbering_path="$tmp/word/numbering.xml"
+
+if ! unzip -p "$input_path" word/numbering.xml > "$numbering_path" 2>/dev/null; then
   echo "skipped postprocess: no numbering.xml"
   exit 0
 fi
 
-node "$script_dir/numbering.mts" "$tmp/word/numbering.xml"
+node "$script_dir/numbering.mts" "$numbering_path"
 
-(cd "$tmp" && zip -q "$docx_abs" word/numbering.xml)
+(cd "$tmp" && zip -q "../$input_file" word/numbering.xml)
