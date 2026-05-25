@@ -5,7 +5,7 @@
 ## GitHub Actions で使う
 
 呼び出し側のリポジトリでは、Markdown をフォルダに置く。変換対象は
-`input_folder` 内の `[0-9]*.md` である。
+`input_dir` 内の `[0-9]*.md` である。
 このリポジトリ側の共通設定は `defaults.yml` にあり、呼び出し側の `config`
 に指定した Pandoc defaults と実行時にマージする。
 
@@ -24,7 +24,7 @@ jobs:
   build:
     uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@v1
     with:
-      input_folder: sample
+      input_dir: sample
       output_name: single-with-toc
       config: defaults.yml
       shared_ref: v1
@@ -38,7 +38,7 @@ jobs:
   build:
     uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@v1
     with:
-      input_folder: sample
+      input_dir: sample
       output_name: sample
       shared_ref: v1
 ```
@@ -70,7 +70,7 @@ jobs:
   with-toc:
     uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@v1
     with:
-      input_folder: sample
+      input_dir: sample
       output_name: with-toc
       config: defaults.yml
       shared_ref: v1
@@ -78,7 +78,7 @@ jobs:
   no-toc:
     uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@v1
     with:
-      input_folder: sample
+      input_dir: sample
       output_name: no-toc
       shared_ref: v1
 ```

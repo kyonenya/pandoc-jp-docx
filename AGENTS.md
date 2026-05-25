@@ -16,9 +16,17 @@
 
 - `build-pandoc.sh` はローカルと GitHub Actions の共通処理である。Pandoc 実行をここに集約する。
 - `build.sh` はローカル用ラッパーである。`build-pandoc.sh` を呼び、その後 `postprocess/numbering.sh` を実行する。
-- `build-pandoc.sh` の引数順は `input_folder output_file [config]` である。`output_file` は必須であり、`config` は第3引数である。
-- `build.sh` の引数順は `input_folder output_name [config]` である。`output_name` は必須であり、`dist/<output_name>.docx` に出力する。
+- `build-pandoc.sh` の引数順は `input_dir output_file [config]` である。`output_file` は必須であり、`config` は第3引数である。
+- `build.sh` の引数順は `input_dir output_name [config]` である。`output_name` は必須であり、`dist/<output_name>.docx` に出力する。
 - workflow 側は `output_name` から `dist/<output_name>.docx` を組み立て、`build-pandoc.sh` へ渡す。
+
+## 命名規則
+
+- パスを表す名前には `path` を使う。`path = dir + file` である。
+- ディレクトリを表す名前には `dir` を使う。
+- ファイルを表す名前には `file` を使う。`file = name + ext` である。
+- 拡張子を含まない名前には `name` を使う。
+- 拡張子を表す名前には `ext` を使う。
 
 ## 検証
 
