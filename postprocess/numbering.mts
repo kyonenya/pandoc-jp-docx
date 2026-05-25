@@ -1,4 +1,4 @@
-// @ts-expect-error no @types/node
+/// <reference types="node" />
 import { readFileSync, writeFileSync } from 'node:fs';
 
 /**
@@ -102,8 +102,6 @@ function main(path: string): void {
     'utf-8',
   );
 }
-
-declare const process: { argv: string[]; exit(code: number): never };
 
 const args = process.argv.slice(2);
 if (args.length !== 1) {
