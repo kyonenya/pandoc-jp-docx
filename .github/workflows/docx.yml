@@ -3,7 +3,7 @@ name: Build DOCX via Pandoc
 on:
   workflow_call:
     inputs:
-      input_folder:
+      input_dir:
         required: true
         type: string
       output_name:
@@ -45,7 +45,7 @@ jobs:
           entrypoint: /bin/sh
           args: >-
             build-pandoc.sh
-            ${{ inputs.input_folder }}
+            ${{ inputs.input_dir }}
             dist/${{ inputs.output_name }}.docx
             "${{ inputs.config }}"
 

@@ -1,12 +1,12 @@
 #!/bin/sh
 set -eu
 
-input_folder=${1:?Usage: $0 input_folder output_file [config]}
-output_file=${2:?Usage: $0 input_folder output_file [config]}
+input_dir=${1:?Usage: $0 input_dir output_file [config]}
+output_file=${2:?Usage: $0 input_dir output_file [config]}
 config=${3:-}
 
 if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
-  input_folder="caller/$input_folder"
+  input_dir="caller/$input_dir"
   output_file="caller/$output_file"
   config=${config:+"caller/$config"}
 fi
@@ -17,4 +17,4 @@ pandoc \
   --defaults=defaults.yml \
   --output="$output_file" \
   ${config:+--defaults="$config"} \
-  "$input_folder"/[0-9]*.md
+  "$input_dir"/[0-9]*.md
