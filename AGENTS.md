@@ -14,10 +14,10 @@
 
 ## スクリプトの役割
 
-- `build-pandoc.sh` はローカルと GitHub Actions の共通処理である。Pandoc 実行、既定 `output_file` の解決、`GITHUB_OUTPUT` への出力をここに集約する。
+- `build-pandoc.sh` はローカルと GitHub Actions の共通処理である。Pandoc 実行、`GITHUB_OUTPUT` への出力をここに集約する。
 - `build.sh` はローカル用ラッパーである。`build-pandoc.sh` を呼び、その後 `postprocess/numbering.sh` を実行する。
-- 引数順はどちらも `input_folder [config] [output_file]` である。`config` を渡しやすくするため、`output_file` は第3引数である。
-- workflow 側で出力パス解決を重複実装しない。必要な既定値処理は `build-pandoc.sh` に寄せる。
+- 引数順はどちらも `input_folder output_file [config]` である。`output_file` は必須であり、`config` は第3引数である。
+- workflow 側で出力パス解決を実装しない。`output_file` は呼び出し側から必ず渡す。
 
 ## 検証
 
@@ -28,8 +28,8 @@ mise exec -- actionlint .github/workflows/*.yml
 git diff --check
 sh -n build-pandoc.sh
 sh -n build.sh
-mise exec -- ./build.sh sample sample/defaults.yml dist/fixture-with-toc.docx
-mise exec -- ./build.sh sample
+mise exec -- ./build.sh sample dist/fixture-with-toc.docx sample/defaults.yml
+mise exec -- ./build.sh sample dist/sample.docx
 unzip -t dist/fixture-with-toc.docx
 unzip -t dist/sample.docx
 ```

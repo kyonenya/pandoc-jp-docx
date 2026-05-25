@@ -1,9 +1,9 @@
 #!/bin/sh
 set -eu
 
-input_folder=${1:?Usage: $0 input_folder [config] [output_file]}
-config=${2:-}
-output_file=${3:-"dist/$(basename "$input_folder").docx"}
+input_folder=${1:?Usage: $0 input_folder output_file [config]}
+output_file=${2:?Usage: $0 input_folder output_file [config]}
+config=${3:-}
 
 if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
   input_folder="caller/$input_folder"

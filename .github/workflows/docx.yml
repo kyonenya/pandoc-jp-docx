@@ -7,9 +7,8 @@ on:
         required: true
         type: string
       output_file:
-        required: false
+        required: true
         type: string
-        default: ''
       config:
         required: false
         type: string
@@ -50,9 +49,9 @@ jobs:
           entrypoint: /bin/sh
           args: >-
             build-pandoc.sh
-            "${{ inputs.input_folder }}"
+            ${{ inputs.input_folder }}
+            ${{ inputs.output_file }}
             "${{ inputs.config }}"
-            "${{ inputs.output_file }}"
 
       - name: Fix generated file ownership
         run: sudo chown -R "$USER:$USER" "${{ steps.pandoc.outputs.publish_dir }}"

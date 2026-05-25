@@ -31,7 +31,7 @@ jobs:
       name: single-with-toc
 ```
 
-`output_file` と `config` は省略できる。
+`output_file` は必須である。`config` は省略できる。
 
 ```yaml
 jobs:
@@ -39,6 +39,7 @@ jobs:
     uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@v1
     with:
       input_folder: sample
+      output_file: dist/sample.docx
       shared_ref: v1
 ```
 
@@ -80,10 +81,10 @@ jobs:
     with:
       name: no-toc
       input_folder: sample
+      output_file: dist/no-toc.docx
       shared_ref: v1
 ```
 
-`output_file` を省略すると `dist/<input_folder の basename>.docx` に出力する。
 生成物は `<caller ref>_pandoc-<name>` ブランチへ publish される。
 
 テスト用 workflow は `.github/workflows/_sample.yml` に置いている。
@@ -93,13 +94,13 @@ jobs:
 ローカルでは後処理込みの `build.sh` を使う。
 
 ```sh
-./build.sh sample
+./build.sh sample dist/sample.docx
 ```
 
 caller defaults と任意の出力先を渡すこともできる。
 
 ```sh
-./build.sh sample sample/defaults.yml dist/with-toc.docx
+./build.sh sample dist/with-toc.docx sample/defaults.yml
 ```
 
 Pandoc 変換部分は `build-pandoc.sh` に集約している。このスクリプトは
