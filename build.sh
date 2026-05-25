@@ -1,13 +1,9 @@
 #!/bin/sh
 set -eu
 
-input_folder=${1:?Usage: $0 input_folder [config] [output_file]}
-config=${2:-}
-output_file=${3:-}
+input_folder=${1:?Usage: $0 input_folder output_file [config]}
+output_file=${2:?Usage: $0 input_folder output_file [config]}
+config=${3:-}
 
-tmp=$(mktemp)
-trap 'rm -f "$tmp"' EXIT
-
-GITHUB_OUTPUT="$tmp" sh build-pandoc.sh "$input_folder" "$config" "$output_file"
-output_file=$(sed -n 's/^output_file=//p' "$tmp")
+sh build-pandoc.sh "$input_folder" "$output_file" "$config"
 ./postprocess/numbering.sh "$output_file"

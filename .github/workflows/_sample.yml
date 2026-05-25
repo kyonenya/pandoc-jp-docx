@@ -24,4 +24,5 @@ jobs:
     with:
       name: single-defaults-only
       input_folder: sample
+      output_file: dist/single-defaults-only.docx
       shared_ref: dev
