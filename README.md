@@ -5,7 +5,9 @@
 ## GitHub Actions で使う
 
 呼び出し側のリポジトリでは、Markdown をフォルダに置く。変換対象は
-`input_dir` 内の `[0-9]*.md` である。
+`input_pattern` に指定した glob パターンである。単一フォルダを対象にする場合は
+`sample/[0-9]*.md`、ネストしたフォルダを対象にする場合は `[A-Z]*/[0-9]*.md`
+のように指定する。
 このリポジトリ側の共通設定は `defaults.yml` にあり、呼び出し側の `config`
 に指定した Pandoc defaults と実行時にマージする。
 
@@ -24,7 +26,7 @@ jobs:
   build:
     uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@v1
     with:
-      input_dir: sample
+      input_pattern: sample/[0-9]*.md
       output_name: single-with-toc
       config: defaults.yml
       shared_ref: v1
@@ -38,7 +40,7 @@ jobs:
   build:
     uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@v1
     with:
-      input_dir: sample
+      input_pattern: sample/[0-9]*.md
       output_name: sample
       shared_ref: v1
 ```
@@ -70,7 +72,7 @@ jobs:
   with-toc:
     uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@v1
     with:
-      input_dir: sample
+      input_pattern: sample/[0-9]*.md
       output_name: with-toc
       config: defaults.yml
       shared_ref: v1
@@ -78,7 +80,7 @@ jobs:
   no-toc:
     uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@v1
     with:
-      input_dir: sample
+      input_pattern: sample/[0-9]*.md
       output_name: no-toc
       shared_ref: v1
 ```
@@ -92,13 +94,13 @@ jobs:
 ローカルでは後処理込みの `build.sh` を使う。
 
 ```sh
-./build.sh sample sample
+./build.sh 'sample/[0-9]*.md' sample
 ```
 
 caller defaults を渡すこともできる。
 
 ```sh
-./build.sh sample with-toc sample/defaults.yml
+./build.sh 'sample/[0-9]*.md' with-toc sample/defaults.yml
 ```
 
 Pandoc 変換部分は `build-pandoc.sh` に集約している。このスクリプトは

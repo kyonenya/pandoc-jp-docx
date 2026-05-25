@@ -10,14 +10,14 @@
 - 公開 reusable workflow は `.github/workflows/docx.yml` である。
 - リポジトリ内検証 workflow は `.github/workflows/_sample.yml` である。
 - shared 側の Pandoc defaults はルートの `defaults.yml` である。`defaults/docx.yml` は使わない。
-- fixture 入力は `sample/` に置く。変換対象 Markdown は `[0-9]*.md` である。
+- fixture 入力は `sample/` に置く。変換対象 Markdown は `sample/[0-9]*.md` である。
 
 ## スクリプトの役割
 
 - `build-pandoc.sh` はローカルと GitHub Actions の共通処理である。Pandoc 実行をここに集約する。
 - `build.sh` はローカル用ラッパーである。`build-pandoc.sh` を呼び、その後 `postprocess/numbering.sh` を実行する。
-- `build-pandoc.sh` の引数順は `input_dir output_file [config]` である。`output_file` は必須であり、`config` は第3引数である。
-- `build.sh` の引数順は `input_dir output_name [config]` である。`output_name` は必須であり、`dist/<output_name>.docx` に出力する。
+- `build-pandoc.sh` の引数順は `input_pattern output_file [config]` である。`output_file` は必須であり、`config` は第3引数である。
+- `build.sh` の引数順は `input_pattern output_name [config]` である。`output_name` は必須であり、`dist/<output_name>.docx` に出力する。
 - workflow 側は `output_name` から `dist/<output_name>.docx` を組み立て、`build-pandoc.sh` へ渡す。
 
 ## 命名規則
@@ -37,8 +37,8 @@ mise exec -- actionlint .github/workflows/*.yml
 git diff --check
 sh -n build-pandoc.sh
 sh -n build.sh
-mise exec -- ./build.sh sample fixture-with-toc sample/defaults.yml
-mise exec -- ./build.sh sample sample
+mise exec -- ./build.sh 'sample/[0-9]*.md' fixture-with-toc sample/defaults.yml
+mise exec -- ./build.sh 'sample/[0-9]*.md' sample
 unzip -t dist/fixture-with-toc.docx
 unzip -t dist/sample.docx
 ```

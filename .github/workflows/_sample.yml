@@ -13,7 +13,7 @@ jobs:
   with-toc:
     uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@dev
     with:
-      input_dir: sample
+      input_pattern: sample/[0-9]*.md
       output_name: single-with-toc
       config: sample/defaults.yml
       shared_ref: dev
@@ -21,6 +21,6 @@ jobs:
   defaults-only:
     uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@dev
     with:
-      input_dir: sample
+      input_pattern: sample/[0-9]*.md
       output_name: single-defaults-only
       shared_ref: dev
