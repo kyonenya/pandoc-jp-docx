@@ -1,6 +1,6 @@
 # Word セクション区切りの仕様とワークアラウンド
 
-`filters/section-break.lua` が reference.docx の値をベタ書きしている理由のメモ。
+`filters/breaks.lua` が reference.docx の値をベタ書きしている理由のメモ。
 
 ## 何が起きるか
 
@@ -55,7 +55,7 @@ Pandoc + Lua フィルターで生 OOXML を書く経路にはこの親切が効
 
 ## ワークアラウンド
 
-`filters/section-break.lua` が出すセクション区切り sectPr に、reference.docx 末尾 sectPr の中身を **写経して全部入れる**:
+`filters/breaks.lua` が出すセクション区切り sectPr に、reference.docx 末尾 sectPr の中身を **写経して全部入れる**:
 
 ```xml
 <w:sectPr>
@@ -84,27 +84,7 @@ Pandoc + Lua フィルターで生 OOXML を書く経路にはこの親切が効
 
 要するに **reference.docx 末尾 sectPr のほぼ完全コピー** + Markdown 由来のセクション種別、という構造。
 
-## メンテナンス手順
-
-reference.docx を編集した後 (フッタ追加・余白変更・寸法変更など) は、以下を確認する。
-
-### 1. rId 番号の確認
-
-```sh
-unzip -p reference.docx word/_rels/document.xml.rels | grep -E "footer|header"
-```
-
-footer/header の relationship ID が変わっていないかチェック。reference 編集で順序が動くとここがズレる。
-
-### 2. 末尾 sectPr の参照値取り出し
-
-```sh
-unzip -p reference.docx word/document.xml | grep -oE '<w:sectPr[^/]*?(/>|.*?</w:sectPr>)' | tail -1
-```
-
-得られた XML を `filters/section-break.lua` の string.format 内に貼り直す。`<w:type w:val="%s"/>` だけは Markdown 由来なのでプレースホルダのまま残す。
-
-#### 転記時の省略ルール
+### 転記時の省略ルール
 
 実際のコマンド出力には Word の編集履歴管理用 ID が混ざる。これらは **省略可** (レイアウト・表示に一切影響しない):
 
@@ -131,10 +111,6 @@ unzip -p reference.docx word/document.xml | grep -oE '<w:sectPr[^/]*?(/>|.*?</w:
 | `<w:cols>` | — | 1 カラムなら省略してもよい (実害なし) |
 
 **紛らわしい点**: `r:id` (relationship id, 必須) と `w:rsidR` 系 (revision save id, 省略可) は頭の `r` が同じなだけで完全に別物。
-
-### 3. ビルドして検証
-
-本文先頭セクションの sectPr にフィルター生成の値 (footerReference 込み) が入っていれば成功。Word で開いて 1 ページ目にページ番号が見えるかも視覚的に確認。
 
 ## 別寸法 reference を使うとき
 

@@ -167,4 +167,4 @@ ON で「左 2 文字 / ぶら下げ 1 文字」、OFF で「左 0.78 cm / ぶ�
 
 ## 関連
 
-- `filters/section-break.lua` / `filter-section-break.md` ... 同じく pandoc の docx 出力を手当てする話 (セクション区切り)
+- `filters/breaks.lua` / `filter-breaks.md` ... 同じく pandoc の docx 出力を手当てする話 (セクション区切り)

@@ -10,7 +10,7 @@
 に指定した Pandoc defaults と実行時にマージする。
 
 ```yaml
-name: Build Single DOCX
+name: Build DOCX
 
 on:
   push:

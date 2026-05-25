@@ -1,4 +1,4 @@
--- 登録した Ambiguous 文字を Word で半角／全角として表示するよう固定する
+-- 登録した Ambiguous 文字を Word で半角/全角として表示するよう固定する
 
 local char_to_hint = {
   -- 半角に固定

@@ -1,4 +1,4 @@
-name: Build Single DOCX
+name: Build Sample DOCX
 
 on:
   push:
