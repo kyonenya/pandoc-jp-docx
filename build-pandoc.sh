@@ -13,9 +13,9 @@ fi
 
 mkdir -p "$(dirname "$output_file")"
 
-set -- $input_pattern  # expand
+set -- $input_pattern # expand
 
-if [ "$#" -eq 1 ] && [ "$1" = "$input_pattern" ]; then
+if [ "$#" -eq 1 ] && [ ! -e "$1" ]; then
   echo "No input files matched: $input_pattern" >&2
   exit 1
 fi
