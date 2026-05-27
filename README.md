@@ -89,9 +89,60 @@ jobs:
 
 テスト用 workflow は `.github/workflows/_sample.yml` に置いている。
 
+## デフォルトスタイル
+
+### 傍点
+
+日本語を含む強調テキストは、Word の丸傍点になる。
+
+日本語を含む <span style="text-emphasis: filled dot; -webkit-text-emphasis: filled dot;">強調テキスト</span> は傍点になる。
+
+日本語を含まない `**strong text**` は、通常の強調のまま出力する。
+
+### ルビ
+
+青空文庫風のルビ記法は、Word のルビになる。
+
+```md
+｜振《ふ》り｜仮名《がな》
+```
+
+<ruby>振<rt>ふ</rt></ruby>り<ruby>仮名<rt>がな</rt></ruby>
+
+脚注内のルビも同じ記法で書ける。
+
+### 半角幅の固定
+
+`§`、`′`、`″` は半角幅で表示する。
+
+### 改ページ・セクション区切り
+
+フェンス付き div で、Word の改ページまたはセクション区切りを挿入できる。
+
+```md
+::: {.page-break}
+:::
+```
+
+```md
+::: {.section-break type="nextPage"}
+:::
+```
+
+`section-break` の `type` には次を指定できる。
+
+- `nextPage`: 次ページからのセクション区切り
+- `oddPage`: 奇数ページからのセクション区切り
+- `evenPage`: 偶数ページからのセクション区切り
+
+### 箇条書き・番号付きリスト
+
+箇条書きと番号付きリストは、Word 用の既定リストスタイルにそろえる。
+インデントはレベルごとに 2 文字ずつ深くなり、ぶら下げ幅は 1 文字である。
+
 ## ローカルで使う
 
-ローカルでは後処理込みの `build.sh` を使う。
+ローカルで開発する際は `build.sh` を使う。
 
 ```sh
 ./build.sh 'sample/[0-9]*.md' sample
@@ -102,6 +153,3 @@ caller defaults を渡すこともできる。
 ```sh
 ./build.sh 'sample/[0-9]*.md' with-toc sample/defaults.yml
 ```
-
-Pandoc 変換部分は `build-pandoc.sh` に集約している。このスクリプトは
-ローカル用 `build.sh` と GitHub Actions の両方から呼び出す。

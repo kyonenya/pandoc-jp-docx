@@ -1,4 +1,5 @@
 -- 登録した Ambiguous 文字を Word で半角/全角として表示するよう固定する
+-- curl -L https://emonkak.pages.dev/articles/wcwidth/ambiguous_width_characters.txt | awk -F '\t' 'NR == 1 || $NF == "A"'
 
 local char_to_hint = {
   -- 半角に固定

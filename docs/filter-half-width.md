@@ -153,6 +153,26 @@ Pandoc 上では Lua フィルターを用いて、`Str` 要素を走査し、�
 
 なお、reference.docx 側でフォントを定義しているなら、`w:rFonts` でフォント名まで明示する必要はない。`w:hint` の値だけを上書きすれば、フォントは reference.docx の既定値が継承される。
 
+## 6. 対象文字を選ぶときの目安
+
+Ambiguous 文字の全体は広いので、日本語文書で実際に使いそうなものから選ぶ。
+このフィルターの用途では、まず次のあたりを見るだけで十分である。
+
+- 記号: `§`, `¶`, `†`, `‡`, `※`, `®`
+- 単位系: `°`, `′`, `″`, `‴`, `℃`, `Å`
+- 数学記号: `±`, `×`, `÷`, `−`, `≠`, `≤`, `≥`, `≒`, `≡`, `∞`, `√`, `∑`, `∫`
+- 矢印: `←`, `↑`, `→`, `↓`, `↔`, `⇔`
+- 丸数字: `①`, `②`, `③`, `④`, `⑤`
+- ローマ数字: `Ⅰ`, `Ⅱ`, `Ⅲ`, `Ⅳ`, `Ⅴ`
+- ギリシャ文字: `α`, `β`, `γ`, `Δ`, `μ`, `Ω`
+
+一覧を確認する場合は、Unicode 公式の `EastAsianWidth.txt` で `;A` の行を見る。
+HTML で見たい場合は、libgrapheme のミラーが行単位で読みやすい。
+
+- [Unicode EastAsianWidth.txt](https://www.unicode.org/Public/UCD/latest/ucd/EastAsianWidth.txt)
+- [libgrapheme の EastAsianWidth.txt HTML 表示](https://git.suckless.org/libgrapheme/file/data/EastAsianWidth.txt.html)
+- [Ambiguous width characters の一覧](https://emonkak.pages.dev/articles/wcwidth/ambiguous_width_characters.txt)
+
 ## 参考資料
 
 - [UAX #11: East Asian Width](https://www.unicode.org/reports/tr11/) — Ambiguous 分類の規範定義
