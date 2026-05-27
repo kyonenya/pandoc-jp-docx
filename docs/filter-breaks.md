@@ -57,13 +57,18 @@ Pandoc + Lua フィルターで生 OOXML を書く経路にはこの親切が効
 
 `filters/breaks.lua` が出すセクション区切り sectPr に、reference.docx 末尾 sectPr の中身を **写経して全部入れる**:
 
+```bash
+unzip -p reference.docx word/document.xml | grep -oE '<w:sectPr[^/]*?(/>|.*?</w:sectPr>)' | tail -1
+```
+
+結果の XML は例えば次の通り。
+
 ```xml
-<w:sectPr>
+<w:sectPr w:rsidR="00321158" w:rsidRPr="009C13DE" w:rsidSect="002E18CE">
   <w:footerReference w:type="even" r:id="rId8"/>
   <w:footerReference w:type="default" r:id="rId9"/>
   <w:headerReference w:type="first" r:id="rId10"/>
   <w:footerReference w:type="first" r:id="rId11"/>
-  <w:type w:val="..."/>
   <w:pgSz w:w="11906" w:h="16838" w:code="9"/>
   <w:pgMar w:top="1985" w:right="1531" w:bottom="1985" w:left="1871" w:header="1077" w:footer="850" w:gutter="0"/>
   <w:cols w:space="720"/>
@@ -72,17 +77,6 @@ Pandoc + Lua フィルターで生 OOXML を書く経路にはこの親切が効
 ```
 
 これにより全セクションで A4・余白・和文グリッド・フッタ参照がそろう。
-
-### 値の出どころ
-
-| 要素 | 出どころ |
-|---|---|
-| `footerReference` / `headerReference` の `r:id` | reference.docx の `word/_rels/document.xml.rels` |
-| `footerReference` / `headerReference` の `w:type` | reference.docx 末尾 sectPr |
-| `pgSz` / `pgMar` / `cols` / `docGrid` | reference.docx 末尾 sectPr |
-| `w:type w:val` | Markdown 側 `::: {.section-break type="..."}` から渡る |
-
-要するに **reference.docx 末尾 sectPr のほぼ完全コピー** + Markdown 由来のセクション種別、という構造。
 
 ### 転記時の省略ルール
 
@@ -111,6 +105,17 @@ Pandoc + Lua フィルターで生 OOXML を書く経路にはこの親切が効
 | `<w:cols>` | — | 1 カラムなら省略してもよい (実害なし) |
 
 **紛らわしい点**: `r:id` (relationship id, 必須) と `w:rsidR` 系 (revision save id, 省略可) は頭の `r` が同じなだけで完全に別物。
+
+### 値の出どころ
+
+| 要素 | 出どころ |
+|---|---|
+| `footerReference` / `headerReference` の `r:id` | reference.docx の `word/_rels/document.xml.rels` |
+| `footerReference` / `headerReference` の `w:type` | reference.docx 末尾 sectPr |
+| `pgSz` / `pgMar` / `cols` / `docGrid` | reference.docx 末尾 sectPr |
+| `w:type w:val` | Markdown 側 `::: {.section-break type="..."}` から渡る |
+
+要するに **reference.docx 末尾 sectPr のほぼ完全コピー** + Markdown 由来のセクション種別、という構造。
 
 ## 別寸法 reference を使うとき
 
