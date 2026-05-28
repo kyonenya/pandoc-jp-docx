@@ -58,9 +58,8 @@ section-break の `type` には以下を指定できる。
 
 呼び出し側のリポジトリの `.github/workflows/` 以下に YAML ファイルを作成する。
 
-pandoc-docx.yml
-
 ```yaml
+# pandoc-docx.yml
 name: Build DOCX
 
 on:
@@ -85,10 +84,10 @@ jobs:
   - 単一フォルダを対象にする場合は
 `sample/[0-9]*.md`、ネストされたフォルダを対象にする場合は `[A-Z]*/[0-9]*.md`
 のように指定する
-- `output_name` でファイル名を指定すると `<output_name>.docx` として出力される
-  - 出力された docx ファイルは main ブランチで実行した場合 `main_pandoc-<output_name>` ブランチにプッシュされる
+- `output_name` で出力する docx ファイルの名前を指定する。`<output_name>.docx` として出力される
+  - 出力されたファイルは、main ブランチで実行した場合 `main_pandoc-<output_name>` ブランチにプッシュされる
 - `config` に Pandoc defaults ファイルを指定できる。コンパイル時にこのリポジトリ側の共通 defaults ファイルとマージされる
-  - 呼び出し側リポジトリの reference.docx を使う場合は、呼び出し側の defaults ファイルで `reference-doc: ${.}/reference.docx` を指定する
+  - 呼び出し側リポジトリの reference.docx を使う場合、呼び出し側の defaults ファイルで `reference-doc: ${.}/reference.docx` を指定する
 
 ## 開発者向け
 
