@@ -4,25 +4,19 @@
 
 ## スタイル
 
-### 傍点
-
-日本語を含む \*\*<ruby>強<rt>・</rt>調<rt>・</rt>テ<rt>・</rt>キ<rt>・</rt>ス<rt>・</rt>ト<rt>・</rt></ruby>\*\* を丸傍点に変換する。
-
-日本語を含まない \*\***strong text**\*\* はデフォルトのまま太字で出力する。
-
 ### ルビ
 
-青空文庫風のルビ記法を Word のルビに変換する。
+青空文庫記法でのルビを Word のルビに変換する。
 
 `｜振《ふ》り｜仮名《がな》` → <ruby>振<rt>ふ</rt></ruby>り<ruby>仮名<rt>がな</rt></ruby>
 
 脚注内のルビも同じ記法で書ける。
 
-### 半角幅の固定
+### 傍点
 
-`§`、`′`、`″` は必ず半角幅で表示させる。
+日本語を含む \*\*<ruby>強<rt>・</rt>調<rt>・</rt>テ<rt>・</rt>キ<rt>・</rt>ス<rt>・</rt>ト<rt>・</rt></ruby>\*\* を丸傍点に変換する。
 
-（デフォルトだと英数字隣接時は半角表示されるが、日本語隣接時に全角表示されてしまう）
+日本語を含まない \*\***strong text**\*\* はデフォルトのまま太字で出力する。
 
 ### 改ページ・セクション区切り
 
@@ -47,6 +41,12 @@ section-break の `type` には以下を指定できる。
 - `nextPage`: 次ページからのセクション区切り
 - `oddPage`: 奇数ページからのセクション区切り
 - `evenPage`: 偶数ページからのセクション区切り
+
+### 半角幅の固定
+
+`§`、`′`、`″` は必ず半角幅で表示させる。
+
+（デフォルトだと英数字隣接時は半角表示されるが、日本語隣接時に全角表示されてしまう）
 
 ### 箇条書き・番号付きリスト
 
@@ -76,26 +76,19 @@ jobs:
     uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@v1
     with:
       input_pattern: sample/[0-9]*.md
-      output_name: single-with-toc
+      output_name: output
       config: defaults.yml # 省略可
       shared_ref: v1
 ```
 
-- `input_pattern` に指定した glob パターンの Markdown ファイルを処理する
+- `input_pattern` に指定した glob パターンにマッチする Markdown ファイルを処理する
   - 単一フォルダを対象にする場合は
-`sample/[0-9]*.md`、ネストしたフォルダを対象にする場合は `[A-Z]*/[0-9]*.md`
+`sample/[0-9]*.md`、ネストされたフォルダを対象にする場合は `[A-Z]*/[0-9]*.md`
 のように指定する
 - `output_name` でファイル名を指定すると `<output_name>.docx` として出力される
-  - DOCX ファイルは main ブランチで実行した場合 `main_pandoc-<output_name>` ブランチにプッシュされる
-- このリポジトリ側の共通 Pandoc defaults 設定ファイルは、呼び出し側の `config` に指定した defaults ファイルと実行時にマージされる
-
-呼び出し側リポジトリの `reference.docx` を使う場合は、呼び出し側の defaults ファイルで `reference-doc` を指定する。相対パスの解決のため `${.}` で指定すること。
-
-defaults.yml
-
-```yaml
-reference-doc: ${.}/reference.docx
-```
+  - 出力された docx ファイルは main ブランチで実行した場合 `main_pandoc-<output_name>` ブランチにプッシュされる
+- `config` に Pandoc defaults ファイルを指定できる。コンパイル時にこのリポジトリ側の共通 defaults ファイルとマージされる
+  - 呼び出し側リポジトリの reference.docx を使う場合は、呼び出し側の defaults ファイルで `reference-doc: ${.}/reference.docx` を指定する
 
 ## 開発者向け
 
@@ -106,5 +99,5 @@ reference-doc: ${.}/reference.docx
 ```
 
 ```sh
-./build.sh 'sample/[0-9]*.md' with-toc sample/defaults.yml
+./build.sh 'sample/[0-9]*.md' with-config sample/defaults.yml
 ```

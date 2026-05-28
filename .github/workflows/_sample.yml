@@ -9,17 +9,17 @@ permissions:
   contents: write
 
 jobs:
-  with-toc:
+  no-config:
     uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@dev
     with:
       input_pattern: sample/[0-9]*.md
-      output_name: single-with-toc
-      config: sample/defaults.yml
+      output_name: no-config
       shared_ref: dev
 
-  defaults-only:
+  with-config:
     uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@dev
     with:
       input_pattern: sample/[0-9]*.md
-      output_name: single-defaults-only
+      output_name: with-config
+      config: sample/defaults.yml
       shared_ref: dev
