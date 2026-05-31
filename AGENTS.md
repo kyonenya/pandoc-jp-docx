@@ -13,11 +13,10 @@
 
 ## スクリプトの役割
 
-- `build-pandoc.sh` はローカルと GitHub Actions の共通処理である。Pandoc 実行をここに集約する。
-- `build.sh` はローカル用ラッパーである。`build-pandoc.sh` を呼び、その後 `postprocess/numbering.sh` を実行する。
-- `build-pandoc.sh` の引数順は `input_pattern output_file [config]` である。`output_file` は必須であり、`config` は第3引数である。
-- `build.sh` の引数順は `input_pattern output_name [config]` である。`output_name` は必須であり、`dist/<output_name>.docx` に出力する。
-- workflow 側は `output_name` から `dist/<output_name>.docx` を組み立て、`build-pandoc.sh` へ渡す。
+- `build.sh` はローカルと GitHub Actions の共通処理である。Pandoc 実行と `postprocess/numbering.sh` の実行をここに集約する。
+- `build.sh` の引数順は `input_pattern output_path [--config=path] [--no-postprocess]` である。`output_path` は必須であり、`config` は任意である。
+- `--no-postprocess` を指定すると `postprocess/numbering.sh` を実行しない。
+- workflow 側は `output_name` から `caller/dist/<output_name>.docx` を組み立て、`build.sh` へ渡す。
 
 ## 命名規則
 
@@ -34,10 +33,11 @@
 ```sh
 mise exec -- actionlint .github/workflows/*.yml
 git diff --check
-sh -n build-pandoc.sh
 sh -n build.sh
-mise exec -- ./build.sh 'sample/[0-9]*.md' with-config sample/defaults.yml
-mise exec -- ./build.sh 'sample/[0-9]*.md' sample
+mise exec -- ./build.sh 'sample/[0-9]*.md' dist/with-config.docx --config=sample/defaults.yml
+mise exec -- ./build.sh 'sample/[0-9]*.md' dist/sample.docx
+mise exec -- ./build.sh 'sample/[0-9]*.md' dist/no-postprocess.docx --no-postprocess
 unzip -t dist/with-config.docx
 unzip -t dist/sample.docx
+unzip -t dist/no-postprocess.docx
 ```

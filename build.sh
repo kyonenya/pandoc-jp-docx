@@ -1,11 +1,48 @@
 #!/bin/sh
-# ローカル開発用
 set -eu
 
-input_pattern=${1:?Usage: $0 input_pattern output_name [config]}
-output_name=${2:?Usage: $0 input_pattern output_name [config]}
-config=${3:-}
-output_file="dist/$output_name.docx"
+usage="Usage: $0 input_pattern output_path [--config=path] [--no-postprocess]"
 
-sh build-pandoc.sh "$input_pattern" "$output_file" "$config"
-./postprocess/numbering.sh "$output_file"
+input_pattern=${1:?"$usage"}
+output_path=${2:?"$usage"}
+config=
+postprocess=true
+
+shift 2
+
+for opt in "$@"; do
+  case "$opt" in
+    '')
+      ;;
+    --config=*)
+      config=${opt#--config=}
+      ;;
+    --no-postprocess)
+      postprocess=false
+      ;;
+    *)
+      echo "Unexpected option: $opt" >&2
+      echo "$usage" >&2
+      exit 1
+      ;;
+  esac
+done
+
+mkdir -p "$(dirname "$output_path")"
+
+set -- $input_pattern # expand
+
+if [ "$#" -eq 1 ] && [ ! -e "$1" ]; then
+  echo "No input files matched: $input_pattern" >&2
+  exit 1
+fi
+
+pandoc \
+  --output="$output_path" \
+  --defaults=defaults.yml \
+  ${config:+--defaults="$config"} \
+  "$@"
+
+if [ "$postprocess" = "true" ]; then
+  ./postprocess/numbering.sh "$output_path"
+fi
