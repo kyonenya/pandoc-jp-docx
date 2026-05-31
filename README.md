@@ -106,5 +106,5 @@ jobs:
 ```
 
 ```sh
-./build.sh 'sample/[0-9]*.md' dist/with-config.docx --config=sample/defaults.yml
+./build.sh 'sample/[0-9]*.md' dist/with-config.docx --defaults=sample/defaults.yml
 ```

@@ -14,7 +14,7 @@
 ## スクリプトの役割
 
 - `build.sh` はローカルと GitHub Actions の共通処理である。Pandoc 実行と `postprocess/numbering.sh` の実行をここに集約する。
-- `build.sh` の引数順は `input_pattern output_path [--config=path] [--no-postprocess]` である。`output_path` は必須であり、`config` は任意である。
+- `build.sh` の引数順は `input_pattern output_path [--defaults=path] [--no-postprocess]` である。`output_path` は必須であり、`config` は任意である。
 - `--no-postprocess` を指定すると `postprocess/numbering.sh` を実行しない。
 - workflow 側は `output_name` から `caller/dist/<output_name>.docx` を組み立て、`build.sh` へ渡す。
 
@@ -34,7 +34,7 @@
 mise exec -- actionlint .github/workflows/*.yml
 git diff --check
 sh -n build.sh
-mise exec -- ./build.sh 'sample/[0-9]*.md' dist/with-config.docx --config=sample/defaults.yml
+mise exec -- ./build.sh 'sample/[0-9]*.md' dist/with-config.docx --defaults=sample/defaults.yml
 mise exec -- ./build.sh 'sample/[0-9]*.md' dist/sample.docx
 mise exec -- ./build.sh 'sample/[0-9]*.md' dist/no-postprocess.docx --no-postprocess
 unzip -t dist/with-config.docx
