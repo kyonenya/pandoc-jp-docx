@@ -38,9 +38,9 @@ if [ "$#" -eq 1 ] && [ ! -e "$1" ]; then
 fi
 
 pandoc \
-  --output="$output_path" \
   --defaults=defaults.yml \
   ${config:+--defaults="$config"} \
+  --output="$output_path" \
   "$@"
 
 if [ "$postprocess" = "true" ]; then

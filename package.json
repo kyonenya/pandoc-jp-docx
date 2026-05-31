@@ -1,6 +1,6 @@
 {
   "name": "pandoc-jp-docx",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "日本語組版向けPandoc Word変換共通ワークフロー",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
