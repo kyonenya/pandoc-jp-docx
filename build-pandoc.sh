@@ -1,4 +1,5 @@
 #!/bin/sh
+# GitHub Actions/ローカル共通
 set -eu
 
 input_pattern=${1:?Usage: $0 input_pattern output_file [config]}

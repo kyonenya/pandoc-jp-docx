@@ -6,7 +6,7 @@
 
 ### ルビ
 
-青空文庫記法でのルビを Word のルビに変換する。
+青空文庫記法のルビを Word のルビに変換する。
 
 `｜振《ふ》り｜仮名《がな》` → <ruby>振<rt>ふ</rt></ruby>り<ruby>仮名<rt>がな</rt></ruby>
 
@@ -29,18 +29,26 @@
 :::
 ```
 
-セクション区切り
+セクション区切り（次ページから）
 
 ```md
 ::: {.section-break type="nextPage"}
 :::
 ```
 
-section-break の `type` には以下を指定できる。
+セクション区切り（奇数ページから）
 
-- `nextPage`: 次ページからのセクション区切り
-- `oddPage`: 奇数ページからのセクション区切り
-- `evenPage`: 偶数ページからのセクション区切り
+```md
+::: {.section-break type="oddPage"}
+:::
+```
+
+セクション区切り（偶数ページから）
+
+```md
+::: {.section-break type="evenPage"}
+:::
+```
 
 ### 半角幅の固定
 
@@ -87,7 +95,7 @@ jobs:
 - `output_name` で出力する docx ファイルの名前を指定する。`<output_name>.docx` として出力される
   - 出力されたファイルは、main ブランチで実行した場合 `main_pandoc-<output_name>` ブランチにプッシュされる
 - `config` に Pandoc defaults ファイルを指定できる。コンパイル時にこのリポジトリ側の共通 defaults ファイルとマージされる
-  - 呼び出し側リポジトリの reference.docx を使う場合、呼び出し側の defaults ファイルで `reference-doc: ${.}/reference.docx` を指定する
+  - 呼び出し側リポジトリの reference.docx を使う場合は、呼び出し側の defaults ファイルで `reference-doc: ${.}/reference.docx` を指定する
 
 ## 開発者向け
 
