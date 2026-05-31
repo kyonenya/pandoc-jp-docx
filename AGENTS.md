@@ -36,8 +36,8 @@ mise exec -- actionlint .github/workflows/*.yml
 git diff --check
 sh -n build-pandoc.sh
 sh -n build.sh
-mise exec -- ./build.sh 'sample/[0-9]*.md' fixture-with-toc sample/defaults.yml
+mise exec -- ./build.sh 'sample/[0-9]*.md' with-config sample/defaults.yml
 mise exec -- ./build.sh 'sample/[0-9]*.md' sample
-unzip -t dist/fixture-with-toc.docx
+unzip -t dist/with-config.docx
 unzip -t dist/sample.docx
 ```
