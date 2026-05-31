@@ -44,10 +44,11 @@ jobs:
         with:
           entrypoint: /bin/sh
           args: >-
-            build-pandoc.sh
+            build.sh
             caller/${{ inputs.input_pattern }}
             caller/dist/${{ inputs.output_name }}.docx
-            "${{ inputs.config && format('caller/{0}', inputs.config) || '' }}"
+            ${{ inputs.config && format('--config=caller/{0}', inputs.config) || '' }}
+            --no-postprocess
 
       - name: Fix generated file ownership
         run: sudo chown -R "$USER:$USER" caller/dist

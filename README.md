@@ -102,9 +102,9 @@ jobs:
 ローカルで開発する際は `build.sh` を実行する。
 
 ```sh
-./build.sh 'sample/[0-9]*.md' sample
+./build.sh 'sample/[0-9]*.md' dist/sample.docx
 ```
 
 ```sh
-./build.sh 'sample/[0-9]*.md' with-config sample/defaults.yml
+./build.sh 'sample/[0-9]*.md' dist/with-config.docx --config=sample/defaults.yml
 ```
