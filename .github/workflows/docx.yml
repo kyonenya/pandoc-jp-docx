@@ -62,11 +62,18 @@ jobs:
         run: ./postprocess/numbering.sh "caller/dist/${{ inputs.output_name }}.docx"
 
       - name: Publish DOCX
-        uses: peaceiris/actions-gh-pages@v4.1.0
-        with:
-          github_token: ${{ github.token }}
-          publish_branch: ${{ github.ref_name }}_pandoc-${{ inputs.output_name }}
-          publish_dir: caller/dist
-          commit_message: 'Publish DOCX: '
-          force_orphan: true
-          disable_nojekyll: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd caller/dist
+
+          git init -b "${{ github.ref_name }}_pandoc-${{ inputs.output_name }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add .
+          git commit -m "Publish DOCX: ${{ github.sha }}"
+
+          gh auth setup-git
+          git remote add origin "https://github.com/${{ github.repository }}.git"
+          git push --force origin HEAD
