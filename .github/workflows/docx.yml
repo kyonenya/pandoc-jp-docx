@@ -9,7 +9,7 @@ on:
       output_name:
         required: true
         type: string
-      config:
+      defaults:
         required: false
         type: string
         default: ''
@@ -47,7 +47,7 @@ jobs:
             build.sh
             caller/${{ inputs.input_pattern }}
             caller/dist/${{ inputs.output_name }}.docx
-            ${{ inputs.config && format('--defaults=caller/{0}', inputs.config) || '' }}
+            ${{ inputs.defaults && format('--defaults=caller/{0}', inputs.defaults) || '' }}
             --no-postprocess
 
       - name: Fix generated file ownership

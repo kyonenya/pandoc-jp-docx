@@ -5,7 +5,7 @@ usage="Usage: $0 input_pattern output_path [--defaults=path] [--no-postprocess]"
 
 input_pattern=${1:?"$usage"}
 output_path=${2:?"$usage"}
-config=
+defaults_path=
 postprocess=true
 
 shift 2
@@ -15,7 +15,7 @@ for opt in "$@"; do
     '')
       ;;
     --defaults=*)
-      config=${opt#--defaults=}
+      defaults_path=${opt#--defaults=}
       ;;
     --no-postprocess)
       postprocess=false
@@ -39,7 +39,7 @@ fi
 
 pandoc \
   --defaults=defaults.yml \
-  ${config:+--defaults="$config"} \
+  ${defaults_path:+--defaults="$defaults_path"} \
   --output="$output_path" \
   "$@"
 

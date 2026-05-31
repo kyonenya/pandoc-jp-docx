@@ -84,7 +84,7 @@ jobs:
     with:
       input_pattern: sample/[0-9]*.md
       output_name: output
-      config: defaults.yml # 省略可
+      defaults: defaults.yml # 省略可
       shared_ref: v1
 ```
 
@@ -94,12 +94,12 @@ jobs:
 のように指定する
 - `output_name` で出力する docx ファイルの名前を指定する。`<output_name>.docx` として出力される
   - 出力されたファイルは、main ブランチで実行した場合 `main_pandoc-<output_name>` ブランチにプッシュされる
-- `config` に Pandoc defaults ファイルを指定できる。コンパイル時にこのリポジトリ側の共通 defaults ファイルとマージされる
+- `defaults` に Pandoc defaults ファイルを指定できる。コンパイル時にこのリポジトリ側の共通 defaults ファイルとマージされる
   - 呼び出し側リポジトリの reference.docx を使う場合は、呼び出し側の defaults ファイルで `reference-doc: ${.}/reference.docx` を指定する
 
 ## 開発者向け
 
-ローカルで開発する際は `build.sh` を実行する。
+ローカルで開発する場合は `build.sh` を実行する。
 
 ```sh
 ./build.sh 'sample/[0-9]*.md' dist/sample.docx
