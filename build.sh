@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-usage="Usage: $0 input_pattern output_path [--config=path] [--no-postprocess]"
+usage="Usage: $0 input_pattern output_path [--defaults=path] [--no-postprocess]"
 
 input_pattern=${1:?"$usage"}
 output_path=${2:?"$usage"}
@@ -14,8 +14,8 @@ for opt in "$@"; do
   case "$opt" in
     '')
       ;;
-    --config=*)
-      config=${opt#--config=}
+    --defaults=*)
+      config=${opt#--defaults=}
       ;;
     --no-postprocess)
       postprocess=false

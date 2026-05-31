@@ -47,7 +47,7 @@ jobs:
             build.sh
             caller/${{ inputs.input_pattern }}
             caller/dist/${{ inputs.output_name }}.docx
-            ${{ inputs.config && format('--config=caller/{0}', inputs.config) || '' }}
+            ${{ inputs.config && format('--defaults=caller/{0}', inputs.config) || '' }}
             --no-postprocess
 
       - name: Fix generated file ownership
