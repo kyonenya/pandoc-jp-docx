@@ -6,12 +6,6 @@ input_pattern=${1:?Usage: $0 input_pattern output_file [config]}
 output_file=${2:?Usage: $0 input_pattern output_file [config]}
 config=${3:-}
 
-if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
-  input_pattern="caller/$input_pattern"
-  output_file="caller/$output_file"
-  config=${config:+"caller/$config"}
-fi
-
 mkdir -p "$(dirname "$output_file")"
 
 set -- $input_pattern # expand
