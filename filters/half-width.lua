@@ -6,6 +6,7 @@ local char_to_hint = {
   ['§'] = 'default',
   ['′'] = 'default',
   ['″'] = 'default',
+  ['‴'] = 'default',
   -- 全角に固定
   -- ['①'] = 'eastAsia',
 }
