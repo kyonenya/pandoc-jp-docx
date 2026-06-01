@@ -18,4 +18,4 @@ fi
 
 node "$script_dir/numbering.mts" "$numbering_path"
 
-(cd "$tmp_dir" && zip -q "../$input_file" word/numbering.xml)
+(cd "$tmp_dir" && zip -q "../$(basename "$input_path")" word/numbering.xml)
