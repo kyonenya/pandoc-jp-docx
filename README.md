@@ -52,7 +52,7 @@
 
 ### 半角幅の固定
 
-セクション記号 `§`、プライム記号 `′`, `″`, `‴` は必ず半角幅で表示させる。
+セクション記号 `§`、プライム記号 `′` `″` `‴` は必ず半角幅で表示させる。
 
 （デフォルトだと英数字隣接時は半角表示されるが、日本語隣接時に全角表示されてしまう）
 
@@ -80,7 +80,7 @@ permissions:
 
 jobs:
   build:
-    uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@v1
+    uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@v2
     with:
       input_pattern: sample/[0-9]*.md
       output_name: output
