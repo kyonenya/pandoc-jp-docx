@@ -13,9 +13,6 @@ on:
         required: false
         type: string
         default: ''
-      shared_ref:
-        required: true
-        type: string
 
 permissions:
   contents: write
@@ -28,8 +25,8 @@ jobs:
       - name: Checkout shared workflow files
         uses: actions/checkout@v6
         with:
-          repository: kyonenya/pandoc-jp-docx
-          ref: ${{ inputs.shared_ref }}
+          repository: ${{ job.workflow_repository }}
+          ref: ${{ job.workflow_sha }}
 
       - name: Checkout caller repository
         uses: actions/checkout@v6

@@ -14,7 +14,6 @@ jobs:
     with:
       input_pattern: sample/[0-9]*.md
       output_name: no-config
-      shared_ref: dev
 
   with-config:
     uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@dev
@@ -22,4 +21,3 @@ jobs:
       input_pattern: sample/[0-9]*.md
       output_name: with-config
       defaults: sample/defaults.yml
-      shared_ref: dev

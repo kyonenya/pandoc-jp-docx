@@ -85,7 +85,6 @@ jobs:
       input_pattern: sample/[0-9]*.md
       output_name: output
       defaults: defaults.yml # 省略可
-      shared_ref: v1
 ```
 
 - `input_pattern` に指定した glob パターンにマッチする Markdown ファイルを処理する
