@@ -3,11 +3,9 @@
 set -eu
 
 input_path=${1:?Usage: $0 path/to/file.docx}
-input_dir=$(dirname "$input_path")
-input_file=$(basename "$input_path")
 script_dir=$(dirname "$0")
 
-tmp_dir=$(mktemp -d "$input_dir/.tmp.XXXXXX")
+tmp_dir=$(mktemp -d "$(dirname "$input_path")/.tmp.XXXXXX")
 trap 'rm -rf "$tmp_dir"' EXIT
 mkdir -p "$tmp_dir/word"
 
