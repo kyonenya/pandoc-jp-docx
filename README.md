@@ -1,6 +1,8 @@
 # pandoc-ja-docx
 
-ルビ・傍点・セクション区切りなどに対応した、日本語組版向けPandoc Word変換共通ワークフロー
+ルビ・傍点・セクション区切りなどに対応した、日本語組版向け Word 文書を [Pandoc](https://github.com/jgm/pandoc) で変換するためのワークフロー
+
+GitHub Actions、およびローカルの両方で使用できる。
 
 ## スタイル
 
@@ -60,9 +62,9 @@
 
 箇条書きと番号付きリストは日本語で 2 文字分のインデント幅になるよう後処理する。
 
-（Pandoc では reference.docx でリストスタイルを指定できないため）
+（Pandoc では reference.docx でリストスタイルを指定できないため後処理をかけている）
 
-## 使い方
+## GitHub Actions の設定
 
 呼び出し側のリポジトリの `.github/workflows/` 以下に YAML ファイルを作成する。
 
@@ -91,14 +93,16 @@ jobs:
   - 単一フォルダを対象にする場合は
 `sample/[0-9]*.md`、ネストされたフォルダを対象にする場合は `[A-Z]*/[0-9]*.md`
 のように指定する
-- `output_name` で出力する docx ファイルの名前を指定する。`<output_name>.docx` として出力される
+- `output_name` で出力する docx ファイルの名前を指定する
+  - `<output_name>.docx` として出力される
   - 出力されたファイルは、main ブランチで実行した場合 `main_pandoc-<output_name>` ブランチにプッシュされる
-- `defaults` に Pandoc defaults ファイルを指定できる。コンパイル時にこのリポジトリ側の共通 defaults ファイルとマージされる
+- `defaults` に Pandoc defaults ファイルを指定できる
+  - コンパイル時にこのリポジトリ側の共通 defaults ファイルとマージされる
   - 呼び出し側リポジトリの reference.docx を使う場合は、呼び出し側の defaults ファイルで `reference-doc: ${.}/reference.docx` を指定する
 
-## 開発者向け
+## ローカルで実行
 
-ローカルで開発する場合は `build.sh` を実行する。
+`build.sh` を実行する。
 
 ```sh
 ./build.sh 'sample/[0-9]*.md' dist/sample.docx
@@ -107,3 +111,5 @@ jobs:
 ```sh
 ./build.sh 'sample/[0-9]*.md' dist/with-config.docx --defaults=sample/defaults.yml
 ```
+
+Pandoc をインストールしておく必要がある。参考: [pandoc/INSTALL.md · jgm/pandoc](https://github.com/jgm/pandoc/blob/main/INSTALL.md)
