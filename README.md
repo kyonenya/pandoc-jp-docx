@@ -64,7 +64,7 @@ GitHub Actions、およびローカルの両方で使用できる。
 
 （Pandoc では reference.docx でリストスタイルを指定できないため後処理をかけている）
 
-## GitHub Actions の設定
+## GitHub Actions での使い方
 
 呼び出し側のリポジトリの `.github/workflows/` 以下に YAML ファイルを作成する。
 
@@ -100,7 +100,7 @@ jobs:
   - コンパイル時にこのリポジトリ側の共通 defaults ファイルとマージされる
   - 呼び出し側リポジトリの reference.docx を使う場合は、呼び出し側の defaults ファイルで `reference-doc: ${.}/reference.docx` を指定する
 
-## ローカルで実行
+## ローカルでの使い方
 
 `build.sh` を実行する。
 
@@ -112,4 +112,4 @@ jobs:
 ./build.sh 'sample/[0-9]*.md' dist/with-config.docx --defaults=sample/defaults.yml
 ```
 
-Pandoc をインストールしておく必要がある。参考: [pandoc/INSTALL.md · jgm/pandoc](https://github.com/jgm/pandoc/blob/main/INSTALL.md)
+[Pandoc をインストール](https://github.com/jgm/pandoc/blob/main/INSTALL.md) しておく必要がある。
