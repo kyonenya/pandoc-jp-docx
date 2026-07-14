@@ -23,7 +23,7 @@ Microsoft Entra 管理センターでアプリを登録する。
 
 ```sh
 ONEDRIVE_CLIENT_ID='<クライアントID>' \
-  mise exec -- node pdf/get-refresh-token.mjs
+  node get-refresh-token.mts
 ```
 
 表示された URL を開いてコードを入力し、PDF 変換に使う個人 Microsoft
@@ -35,7 +35,7 @@ ONEDRIVE_CLIENT_ID='<クライアントID>' \
 
 ```sh
 ONEDRIVE_CLIENT_ID='<クライアントID>' \
-  mise exec -- node pdf/get-refresh-token.mjs \
+  node get-refresh-token.mts \
   | gh secret set ONEDRIVE_REFRESH_TOKEN --repo '<owner/repository>'
 ```
 

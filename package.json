@@ -2,9 +2,6 @@
   "name": "pandoc-jp-docx",
   "version": "2.0.0",
   "description": "日本語組版向けPandoc Word変換共通ワークフロー",
-  "scripts": {
-    "test": "node --test"
-  },
   "keywords": [],
   "author": "kyonenya",
   "license": "MIT",

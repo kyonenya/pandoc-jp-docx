@@ -16,13 +16,16 @@
 - `--no-postprocess` を指定すると `postprocess/numbering.sh` を実行しない。
 - workflow 側は `output_name` から `caller/dist/<output_name>.docx` を組み立て、`build.sh` へ渡す。
 
-## 命名規則
+## コード規約
 
-- パスを表す名前には `path` を使う。`path = dir + file` である。
-- ディレクトリを表す名前には `dir` を使う。
-- ファイルを表す名前には `file` を使う。`file = name + ext` である。
-- 拡張子を含まない名前には `name` を使う。
-- 拡張子を表す名前には `ext` を使う。
+- 一回しか使われない関数や変数は切り出さずにインラインで書けるか検討して
+- 一行で書けるものは一行で書いて
+- 命名規則
+  - パスを表す名前には `path` を使う。`path = dir + file` である。
+  - ディレクトリを表す名前には `dir` を使う。
+  - ファイルを表す名前には `file` を使う。`file = name + ext` である。
+    - 拡張子を含まない名前には `name` を使う。
+    - 拡張子を表す名前には `ext` を使う。
 
 ## 検証
 
