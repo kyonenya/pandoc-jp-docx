@@ -91,9 +91,9 @@ async function main(clientId: string): Promise<void> {
   process.stdout.write(`${refreshToken}\n`);
 }
 
-const clientId = process.env.ONEDRIVE_CLIENT_ID;
+const clientId = process.env.MS_CLIENT_ID;
 if (!clientId) {
-  console.error('ONEDRIVE_CLIENT_IDを設定してください');
+  console.error('MS_CLIENT_IDを設定してください');
   process.exit(1);
 }
 

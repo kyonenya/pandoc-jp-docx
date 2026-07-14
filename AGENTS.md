@@ -15,6 +15,8 @@
 - `build.sh` の引数順は `input_pattern output_path [--defaults=path] [--no-postprocess]` である。`output_path` は必須であり、`defaults` は任意である。
 - `--no-postprocess` を指定すると `postprocess/numbering.sh` を実行しない。
 - workflow 側は `output_name` から `caller/dist/<output_name>.docx` を組み立て、`build.sh` へ渡す。
+- `postprocess/pdf.mts` で、Microsoft Graph API を使って DOCX を PDF に変換する。
+  - `get-refresh-token.mts` で初回のリフレッシュトークンを取得する。
 
 ## コード規約
 

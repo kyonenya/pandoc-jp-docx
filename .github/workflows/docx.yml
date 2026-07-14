@@ -18,9 +18,9 @@ on:
         type: boolean
         default: false
     secrets:
-      onedrive_client_id:
+      ms_client_id:
         required: false
-      onedrive_refresh_token:
+      ms_refresh_token:
         required: false
 
 permissions:
@@ -73,8 +73,8 @@ jobs:
         env:
           DOCX_PATH: caller/dist/${{ inputs.output_name }}.docx
           PDF_PATH: caller/dist/${{ inputs.output_name }}.pdf
-          ONEDRIVE_CLIENT_ID: ${{ secrets.onedrive_client_id }}
-          ONEDRIVE_REFRESH_TOKEN: ${{ secrets.onedrive_refresh_token }}
+          MS_CLIENT_ID: ${{ secrets.ms_client_id }}
+          MS_REFRESH_TOKEN: ${{ secrets.ms_refresh_token }}
         run: node ./postprocess/pdf.mts "$DOCX_PATH" "$PDF_PATH"
 
       - name: Publish documents

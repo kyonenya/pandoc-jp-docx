@@ -160,14 +160,14 @@ if (args.length !== 2) {
   process.exit(2);
 }
 
-const clientId = process.env.ONEDRIVE_CLIENT_ID;
-const refreshToken = process.env.ONEDRIVE_REFRESH_TOKEN;
+const clientId = process.env.MS_CLIENT_ID;
+const refreshToken = process.env.MS_REFRESH_TOKEN;
 if (!clientId) {
-  console.error('ONEDRIVE_CLIENT_IDを設定してください');
+  console.error('MS_CLIENT_IDを設定してください');
   process.exit(1);
 }
 if (!refreshToken) {
-  console.error('ONEDRIVE_REFRESH_TOKENを設定してください');
+  console.error('MS_REFRESH_TOKENを設定してください');
   process.exit(1);
 }
 

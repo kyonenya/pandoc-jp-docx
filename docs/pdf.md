@@ -22,7 +22,7 @@ Microsoft Entra 管理センターでアプリを登録する。
 このリポジトリで、次のコマンドを実行する。
 
 ```sh
-ONEDRIVE_CLIENT_ID='<クライアントID>' \
+MS_CLIENT_ID='<クライアントID>' \
   node get-refresh-token.mts
 ```
 
@@ -34,15 +34,15 @@ ONEDRIVE_CLIENT_ID='<クライアントID>' \
 登録する場合は次のように実行する。
 
 ```sh
-ONEDRIVE_CLIENT_ID='<クライアントID>' \
+MS_CLIENT_ID='<クライアントID>' \
   node get-refresh-token.mts \
-  | gh secret set ONEDRIVE_REFRESH_TOKEN --repo '<owner/repository>'
+  | gh secret set MS_REFRESH_TOKEN --repo '<owner/repository>'
 ```
 
 クライアント ID も呼び出し側リポジトリに登録する。
 
 ```sh
-gh secret set ONEDRIVE_CLIENT_ID \
+gh secret set MS_CLIENT_ID \
   --repo '<owner/repository>' \
   --body '<クライアントID>'
 ```
@@ -61,8 +61,8 @@ jobs:
       output_name: output
       pdf: true
     secrets:
-      onedrive_client_id: ${{ secrets.ONEDRIVE_CLIENT_ID }}
-      onedrive_refresh_token: ${{ secrets.ONEDRIVE_REFRESH_TOKEN }}
+      ms_client_id: ${{ secrets.MS_CLIENT_ID }}
+      ms_refresh_token: ${{ secrets.MS_REFRESH_TOKEN }}
 ```
 
 PDF 変換に失敗した場合、workflow はエラーを表示して DOCX だけを成果物ブランチへ
@@ -72,4 +72,4 @@ PDF 変換に失敗した場合、workflow はエラーを表示して DOCX だ�
 ## トークンを更新する
 
 リフレッシュトークンが無効になった場合は、初回認証と同じコマンドを再実行し、
-呼び出し側リポジトリの `ONEDRIVE_REFRESH_TOKEN` を更新する。
+呼び出し側リポジトリの `MS_REFRESH_TOKEN` を更新する。

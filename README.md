@@ -113,8 +113,8 @@ jobs:
       output_name: output
       pdf: true
     secrets:
-      onedrive_client_id: ${{ secrets.ONEDRIVE_CLIENT_ID }}
-      onedrive_refresh_token: ${{ secrets.ONEDRIVE_REFRESH_TOKEN }}
+      ms_client_id: ${{ secrets.MS_CLIENT_ID }}
+      ms_refresh_token: ${{ secrets.MS_REFRESH_TOKEN }}
 ```
 
 - `pdf` のデフォルトは `false`
