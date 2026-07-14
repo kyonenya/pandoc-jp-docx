@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "description": "日本語組版向けPandoc Word変換共通ワークフロー",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test"
   },
   "keywords": [],
   "author": "kyonenya",

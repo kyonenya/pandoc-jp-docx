@@ -100,6 +100,32 @@ jobs:
   - コンパイル時にこのリポジトリ側の共通 defaults ファイルとマージされる
   - 呼び出し側リポジトリの reference.docx を使う場合は、呼び出し側の defaults ファイルで `reference-doc: ${.}/reference.docx` を指定する
 
+### PDF も出力する
+
+Microsoft Graph API と個人用 OneDrive を使って、生成した DOCX を PDF に変換できる。
+
+```yaml
+jobs:
+  build:
+    uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@v2
+    with:
+      input_pattern: sample/[0-9]*.md
+      output_name: output
+      pdf: true
+    secrets:
+      onedrive_client_id: ${{ secrets.ONEDRIVE_CLIENT_ID }}
+      onedrive_refresh_token: ${{ secrets.ONEDRIVE_REFRESH_TOKEN }}
+```
+
+- `pdf` のデフォルトは `false`
+- `pdf: true` の場合は `<output_name>.docx` と `<output_name>.pdf` を出力する
+- PDF 変換に失敗した場合も DOCX は出力する
+- OneDrive にアップロードした DOCX は、PDF 変換後に完全削除を試みる
+- クライアント ID とリフレッシュトークンは、呼び出し側リポジトリの Secrets に設定する
+
+Entra アプリの登録とリフレッシュトークンの取得方法は
+[PDF 出力の設定](docs/pdf.md)を参照する。
+
 ## ローカルでの使い方
 
 `build.sh` を実行する。
