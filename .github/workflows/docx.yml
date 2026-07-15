@@ -22,6 +22,8 @@ on:
         required: false
       ms_refresh_token:
         required: false
+      gh_secrets_write_pat:
+        required: false
 
 permissions:
   contents: write
@@ -75,7 +77,29 @@ jobs:
           PDF_PATH: caller/dist/${{ inputs.output_name }}.pdf
           MS_CLIENT_ID: ${{ secrets.ms_client_id }}
           MS_REFRESH_TOKEN: ${{ secrets.ms_refresh_token }}
+          MS_REFRESH_TOKEN_OUTPUT_PATH: ${{ runner.temp }}/ms-refresh-token
         run: node ./postprocess/pdf.mts "$DOCX_PATH" "$PDF_PATH"
+
+      - name: Update Microsoft refresh token
+        if: ${{ inputs.pdf }}
+        env:
+          GH_TOKEN: ${{ secrets.gh_secrets_write_pat }}
+          MS_REFRESH_TOKEN_OUTPUT_PATH: ${{ runner.temp }}/ms-refresh-token
+        run: |
+          trap 'rm -f "$MS_REFRESH_TOKEN_OUTPUT_PATH"' EXIT
+
+          if [ -z "$GH_TOKEN" ]; then
+            echo '::warning::gh_secrets_write_patが設定されていないため、MS_REFRESH_TOKENを自動更新できません'
+            exit 0
+          fi
+
+          if [ ! -s "$MS_REFRESH_TOKEN_OUTPUT_PATH" ]; then
+            exit 0
+          fi
+
+          if ! gh secret set MS_REFRESH_TOKEN --repo "$GITHUB_REPOSITORY" < "$MS_REFRESH_TOKEN_OUTPUT_PATH"; then
+            echo '::warning::MS_REFRESH_TOKENの自動更新に失敗しました。成果物の公開処理を続行します'
+          fi
 
       - name: Publish documents
         env:

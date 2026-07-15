@@ -9,6 +9,7 @@ interface ResponseBody {
   error_description?: string;
   id?: unknown;
   parentReference?: { driveId?: unknown };
+  refresh_token?: unknown;
 }
 
 function errorMessage(body: ResponseBody, fallback: string): string {
@@ -46,6 +47,7 @@ async function main(
   outputPath: string,
   clientId: string,
   refreshToken: string,
+  refreshTokenOutputPath?: string,
 ): Promise<void> {
   const tokenResponse = await fetch(
     'https://login.microsoftonline.com/consumers/oauth2/v2.0/token',
@@ -66,6 +68,24 @@ async function main(
   );
   if (typeof tokenBody.access_token !== 'string') {
     throw new Error('認証応答にアクセストークンがありません');
+  }
+  if (refreshTokenOutputPath) {
+    if (typeof tokenBody.refresh_token === 'string') {
+      try {
+        await mkdir(dirname(refreshTokenOutputPath), { recursive: true });
+        await writeFile(refreshTokenOutputPath, tokenBody.refresh_token, {
+          mode: 0o600,
+        });
+      } catch (error) {
+        console.error(
+          `リフレッシュトークンを一時保存できないため、自動更新できません: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
+    } else {
+      console.error(
+        '認証応答に新しいリフレッシュトークンがないため、自動更新できません',
+      );
+    }
   }
 
   const accessToken = tokenBody.access_token;
@@ -172,7 +192,13 @@ if (!refreshToken) {
 }
 
 try {
-  await main(args[0], args[1], clientId, refreshToken);
+  await main(
+    args[0],
+    args[1],
+    clientId,
+    refreshToken,
+    process.env.MS_REFRESH_TOKEN_OUTPUT_PATH,
+  );
 } catch (error) {
   console.error(error instanceof Error ? error.message : String(error));
   process.exitCode = 1;

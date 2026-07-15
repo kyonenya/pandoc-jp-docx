@@ -115,6 +115,7 @@ jobs:
     secrets:
       ms_client_id: ${{ secrets.MS_CLIENT_ID }}
       ms_refresh_token: ${{ secrets.MS_REFRESH_TOKEN }}
+      gh_secrets_write_pat: ${{ secrets.GH_SECRETS_WRITE_PAT }}
 ```
 
 - `pdf` のデフォルトは `false`
@@ -122,6 +123,9 @@ jobs:
 - PDF 変換に失敗した場合も DOCX は出力する
 - OneDrive にアップロードした DOCX は、PDF 変換後に完全削除を試みる
 - クライアント ID とリフレッシュトークンは、呼び出し側リポジトリの Secrets に設定する
+- リフレッシュトークンの自動更新には、GitHub Secret 更新用 PAT を使用する
+- PDF 変換時に新しいリフレッシュトークンを取得し、呼び出し側リポジトリの Secret を自動更新する
+- PAT が未設定または無効な場合は警告を表示し、PDF 変換と成果物の公開を続行する
 
 Entra アプリの登録とリフレッシュトークンの取得方法は
 [PDF 出力の設定](docs/pdf.md)を参照する。

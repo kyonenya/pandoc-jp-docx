@@ -50,6 +50,28 @@ gh secret set MS_CLIENT_ID \
 クライアント ID は秘密情報ではないが、reusable workflow へ渡す値を揃えるため
 Secret として扱う。リフレッシュトークンはリポジトリや `.env` に保存しない。
 
+## GitHub Secret 更新用 PAT を登録する
+
+呼び出し側リポジトリの `MS_REFRESH_TOKEN` を自動更新するため、
+[fine-grained personal access token](https://github.com/settings/personal-access-tokens/new)
+を作成する。
+
+- Expiration: `No expiration`
+- Resource owner: 呼び出し側リポジトリの owner
+- Repository access: `Only select repositories`
+- Selected repositories: reusable workflow を利用するリポジトリ
+- Repository permissions: `Secrets` を `Read and write`
+
+同じ resource owner の複数リポジトリで使用する場合は、1 つの PAT で対象の
+リポジトリを複数選択できる。resource owner が異なる場合は owner ごとに PAT を
+作成する。
+
+作成した PAT を、各呼び出し側リポジトリへ登録する。
+
+```sh
+gh secret set GH_SECRETS_WRITE_PAT --repo '<owner/repository>'
+```
+
 ## Reusable workflow を呼び出す
 
 ```yaml
@@ -63,6 +85,7 @@ jobs:
     secrets:
       ms_client_id: ${{ secrets.MS_CLIENT_ID }}
       ms_refresh_token: ${{ secrets.MS_REFRESH_TOKEN }}
+      gh_secrets_write_pat: ${{ secrets.GH_SECRETS_WRITE_PAT }}
 ```
 
 PDF 変換に失敗した場合、workflow はエラーを表示して DOCX だけを成果物ブランチへ
@@ -71,5 +94,12 @@ PDF 変換に失敗した場合、workflow はエラーを表示して DOCX だ�
 
 ## トークンを更新する
 
-リフレッシュトークンが無効になった場合は、初回認証と同じコマンドを再実行し、
-呼び出し側リポジトリの `MS_REFRESH_TOKEN` を更新する。
+PDF 変換時に Microsoft から新しいリフレッシュトークンを取得し、呼び出し側
+リポジトリの `MS_REFRESH_TOKEN` を自動更新する。
+
+`GH_SECRETS_WRITE_PAT` が未設定または無効な場合や、GitHub Secret の更新に
+失敗した場合は警告を表示する。取得済みのアクセストークンによる PDF 変換と
+成果物の公開は続行する。
+
+`MS_REFRESH_TOKEN` 自体が無効になった場合は、初回認証と同じコマンドを再実行して
+更新する。

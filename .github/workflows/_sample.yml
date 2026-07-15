@@ -25,3 +25,4 @@ jobs:
     secrets:
       ms_client_id: ${{ secrets.MS_CLIENT_ID }}
       ms_refresh_token: ${{ secrets.MS_REFRESH_TOKEN }}
+      gh_secrets_write_pat: ${{ secrets.GH_SECRETS_WRITE_PAT }}
