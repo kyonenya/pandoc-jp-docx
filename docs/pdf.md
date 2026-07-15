@@ -11,7 +11,7 @@ Microsoft Entra 管理センターでアプリを登録する。
 - サポートされているアカウントの種類: 個人用 Microsoft アカウントのみ
 - リダイレクト URI: なし
 - パブリック クライアント フローを許可する: はい
-- Microsoft Graph の委任されたアクセス許可: `Files.ReadWrite`
+- Microsoft Graph の委任されたアクセス許可: `Files.ReadWrite.AppFolder`
 
 クライアントシークレットは作成しない。
 
@@ -87,7 +87,7 @@ jobs:
 ```
 
 PDF 変換に失敗した場合、workflow はエラーを表示して DOCX だけを成果物ブランチへ
-出力する。OneDrive 上の DOCX の完全削除に失敗した場合もエラーを表示するが、
+出力する。OneDrive 上の DOCX をごみ箱へ移動できなかった場合もエラーを表示するが、
 成果物の出力は続行する。
 
 ## トークンを更新する

@@ -121,7 +121,7 @@ jobs:
 - `pdf` のデフォルトは `false`
 - `pdf: true` の場合は `<output_name>.docx` と `<output_name>.pdf` を出力する
 - PDF 変換に失敗した場合も DOCX は出力する
-- OneDrive にアップロードした DOCX は、PDF 変換後に完全削除を試みる
+- OneDrive にアップロードした DOCX は、PDF 変換後にごみ箱へ移動を試みる
 - クライアント ID とリフレッシュトークンは、呼び出し側リポジトリの Secrets に設定する
 - リフレッシュトークンの自動更新には、GitHub Secret 更新用 PAT を使用する
 - PDF 変換時に新しいリフレッシュトークンを取得し、呼び出し側リポジトリの Secret を自動更新する

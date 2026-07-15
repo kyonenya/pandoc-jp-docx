@@ -48,7 +48,8 @@ function oauthRequest(
         client_id: clientId,
         refresh_token: refreshToken,
         grant_type: 'refresh_token',
-        scope: 'https://graph.microsoft.com/Files.ReadWrite offline_access',
+        scope:
+          'https://graph.microsoft.com/Files.ReadWrite.AppFolder offline_access',
       }),
     },
   );
@@ -65,6 +66,7 @@ async function main(
     access_token: string;
     refresh_token?: string;
   }>(await oauthRequest(clientId, refreshToken), 'get an access token');
+
   if (refreshTokenOutputPath) {
     if (!refresh_token) {
       console.error(
@@ -84,15 +86,9 @@ async function main(
     }
   }
 
-  const {
-    id: appRootId,
-    parentReference: { driveId },
-  } = await json<{
-    id: string;
-    parentReference: { driveId: string };
-  }>(
+  const { id: appRootId } = await json<{ id: string }>(
     await graphRequest(
-      '/me/drive/special/approot?$select=id,parentReference',
+      '/me/drive/special/approot?$select=id',
       {},
       access_token,
     ),
@@ -130,8 +126,8 @@ async function main(
     try {
       await ok(
         await graphRequest(
-          `/drives/${encodeURIComponent(driveId)}/items/${encodeURIComponent(itemId)}/permanentDelete`,
-          { method: 'POST', headers: { Accept: 'application/json' } },
+          `/me/drive/items/${encodeURIComponent(itemId)}`,
+          { method: 'DELETE' },
           access_token,
         ),
         'delete the uploaded DOCX',

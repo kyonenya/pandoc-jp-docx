@@ -6,7 +6,7 @@ ms_client_id=${1:?Usage: $0 ms_client_id}
 auth_url='https://login.microsoftonline.com/consumers/oauth2/v2.0'
 response=$(curl --fail --silent --show-error \
   --data-urlencode "client_id=$ms_client_id" \
-  --data-urlencode 'scope=https://graph.microsoft.com/Files.ReadWrite offline_access' \
+  --data-urlencode 'scope=https://graph.microsoft.com/Files.ReadWrite.AppFolder offline_access' \
   "$auth_url/devicecode")
 
 jq -r '.message' <<<"$response" >&2
