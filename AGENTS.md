@@ -16,7 +16,7 @@
 - `--no-postprocess` を指定すると `postprocess/numbering.sh` を実行しない。
 - workflow 側は `output_name` から `caller/dist/<output_name>.docx` を組み立て、`build.sh` へ渡す。
 - `postprocess/pdf.mts` で、Microsoft Graph API を使って DOCX を PDF に変換する。
-  - `get-refresh-token.mts` で初回のリフレッシュトークンを取得する。
+  - `get-refresh-token.sh` で初回のリフレッシュトークンを取得する。
 
 ## コード規約
 
