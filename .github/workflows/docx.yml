@@ -93,7 +93,7 @@ jobs:
           gh secret set MS_REFRESH_TOKEN --repo "$GITHUB_REPOSITORY" < "$MS_REFRESH_TOKEN_OUTPUT_PATH" \
             || echo '::warning::Could not update MS_REFRESH_TOKEN; automatic refresh is skipped'
 
-      - name: Publish documents
+      - name: Publish DOCX${{ inputs.pdf && ' and PDF' || '' }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -104,7 +104,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add .
-          git commit -m "Publish documents: ${{ github.sha }}"
+          git commit -m "Publish DOCX${{ inputs.pdf && ' and PDF' || '' }}: ${{ github.sha }}"
 
           gh auth setup-git
           git remote add origin "https://github.com/${{ github.repository }}.git"

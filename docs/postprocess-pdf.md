@@ -4,15 +4,17 @@
 
 PDF 変換時に Microsoft から取得した新しいリフレッシュトークンをもとに、呼び出し側リポジトリの `MS_REFRESH_TOKEN` を自己更新する。
 
-以下の3つの情報を呼び出し側リポジトリの Secrets に登録することで使用できる。
+以下の3つの値を呼び出し側リポジトリの Actions Secrets に登録することで使用できる。
 
-1. `MS_CLIENT_ID`: Entra アプリのクライアント ID
-2. `MS_REFRESH_TOKEN`: PDF 変換に使用するリフレッシュトークン
-3. `GH_SECRETS_WRITE_PAT`: GitHub Secret を更新するための PAT
+1. [`MS_CLIENT_ID`](#1-entra-アプリを登録する): Entra アプリのクライアント ID
+2. [`MS_REFRESH_TOKEN`](#2-初回用のリフレッシュトークンを取得する): PDF 変換に使用するリフレッシュトークン（初回用、2回目以降は自動更新される）
+3. [`GH_SECRETS_WRITE_PAT`](#3-github-secret-更新用-pat-を登録する): GitHub Secrets を更新するための personal access token
+
+ブラウザ上で登録する場合は、呼び出し側リポジトリの Settings > Secrets and variables > Actions を開き、Repository secrets に値を追加する。
 
 ## 1. Entra アプリを登録する
 
-Microsoft Entra 管理センターでアプリを登録する。
+[Microsoft Entra 管理センター](https://entra.microsoft.com/)でアプリを登録する。
 
 - 名前: `pandoc-jp-docx`
 - サポートされているアカウントの種類: 個人用 Microsoft アカウントのみ
@@ -21,13 +23,13 @@ Microsoft Entra 管理センターでアプリを登録する。
 - Microsoft Graph の委任されたアクセス許可: `Files.ReadWrite.AppFolder`
 - （クライアントシークレットは作成しない）
 
-登録後、アプリケーション ID （クライアント ID）をコピーして Secrets に登録する。
+登録後、アプリケーション ID （クライアント ID）をコピーして `MS_CLIENT_ID` という名前で Secrets に登録する。
 
 ```bash
 gh secret set MS_CLIENT_ID --repo 'owner/repository'
 ```
 
-## 2. リフレッシュトークンを取得する
+## 2. 初回用のリフレッシュトークンを取得する
 
 `curl` と `jq` をインストールし、次のコマンドをクライアント ID を書き換えたうえで実行する。
 
@@ -68,7 +70,7 @@ done
 SH
 ```
 
-認証完了後、標準出力に表示されたリフレッシュトークンをコピーして Secrets に登録する。
+認証完了後、標準出力に表示されたリフレッシュトークンをコピーして `MS_REFRESH_TOKEN` という名前で Secrets に登録する。
 
 ```bash
 gh secret set MS_REFRESH_TOKEN --repo 'owner/repository'
@@ -84,13 +86,13 @@ gh secret set MS_REFRESH_TOKEN --repo 'owner/repository'
 - Resource owner: 呼び出し側リポジトリの owner
 - Repository access: `Only select repositories`
 - Selected repositories: reusable workflow を利用するリポジトリ
-- Repository permissions: `Secrets` を `Read and write`
+- Repository permissions: `Secrets` に `Read and write` を選択
 
 同じ resource owner の複数リポジトリで使用する場合は、1 つの PAT で対象の
 リポジトリを複数選択できる。resource owner が異なる場合は owner ごとに PAT を
 作成する。
 
-作成後、PAT を各呼び出し側リポジトリへ登録する。
+作成後、PAT をコピーして `GH_SECRETS_WRITE_PAT` という名前で呼び出し側リポジトリへ登録する。
 
 ```sh
 gh secret set GH_SECRETS_WRITE_PAT --repo 'owner/repository'
