@@ -1,8 +1,16 @@
 # PDF 出力の設定
 
-生成した DOCX を Microsoft Graph API で個人用 OneDrive に一時アップロードし、PDF としてダウンロードする。
+生成した DOCX を Microsoft Graph API で個人用 OneDrive に一時アップロードし、PDF としてダウンロードする機能。
 
-## Entra アプリを登録する
+PDF 変換時に Microsoft から取得した新しいリフレッシュトークンをもとに、呼び出し側リポジトリの `MS_REFRESH_TOKEN` を自己更新する。
+
+以下の3つの情報を呼び出し側リポジトリの Secrets に登録することで使用できる。
+
+1. `MS_CLIENT_ID`: Entra アプリのクライアント ID
+2. `MS_REFRESH_TOKEN`: PDF 変換に使用するリフレッシュトークン
+3. `GH_SECRETS_WRITE_PAT`: GitHub Secret を更新するための PAT
+
+## 1. Entra アプリを登録する
 
 Microsoft Entra 管理センターでアプリを登録する。
 
@@ -13,15 +21,17 @@ Microsoft Entra 管理センターでアプリを登録する。
 - Microsoft Graph の委任されたアクセス許可: `Files.ReadWrite.AppFolder`
 - （クライアントシークレットは作成しない）
 
-登録後、アプリケーション ID （クライアント ID）をコピーして呼び出し側リポジトリの Secrets に登録する。
+登録後、アプリケーション ID （クライアント ID）をコピーして Secrets に登録する。
 
 ```bash
 gh secret set MS_CLIENT_ID --repo 'owner/repository'
 ```
 
-## リフレッシュトークンを取得する
+## 2. リフレッシュトークンを取得する
 
-`curl` と `jq` をインストールし、次のコマンドをクライアント ID を書き換えて実行する。
+`curl` と `jq` をインストールし、次のコマンドをクライアント ID を書き換えたうえで実行する。
+
+表示された URL を開いてコードを入力し、PDF 変換に使う個人 Microsoft アカウントでサインインする。
 
 ```bash
 bash <<'SH'
@@ -58,15 +68,13 @@ done
 SH
 ```
 
-表示された URL を開いてコードを入力し、PDF 変換に使う個人 Microsoft アカウントでサインインする。
-
-認証完了後、標準出力に表示されたリフレッシュトークンをコピーして呼び出し側リポジトリの Secrets に登録する。
+認証完了後、標準出力に表示されたリフレッシュトークンをコピーして Secrets に登録する。
 
 ```bash
 gh secret set MS_REFRESH_TOKEN --repo 'owner/repository'
 ```
 
-## GitHub Secret 更新用 PAT を登録する
+## 3. GitHub Secret 更新用 PAT を登録する
 
 呼び出し側リポジトリの `MS_REFRESH_TOKEN` を自動更新するため、
 [fine-grained personal access token](https://github.com/settings/personal-access-tokens/new)
@@ -87,31 +95,3 @@ gh secret set MS_REFRESH_TOKEN --repo 'owner/repository'
 ```sh
 gh secret set GH_SECRETS_WRITE_PAT --repo 'owner/repository'
 ```
-
-## Reusable workflow を呼び出す
-
-```yaml
-jobs:
-  build:
-    uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@v2
-    with:
-      input_pattern: sample/[0-9]*.md
-      output_name: output
-      pdf: true
-    secrets:
-      ms_client_id: ${{ secrets.MS_CLIENT_ID }}
-      ms_refresh_token: ${{ secrets.MS_REFRESH_TOKEN }}
-      gh_secrets_write_pat: ${{ secrets.GH_SECRETS_WRITE_PAT }}
-```
-
-PDF 変換時に Microsoft から新しいリフレッシュトークンを取得し、呼び出し側リポジトリの `MS_REFRESH_TOKEN` が自動更新される。
-
-`MS_REFRESH_TOKEN` 自体が無効になった場合は初回認証と同じコマンドを再実行して更新すること。
-
-### エラー時の挙動
-
-- PDF 変換に失敗した場合、workflow はエラーを表示して DOCX だけを成果物ブランチへ出力する
-- OneDrive 上の DOCX をごみ箱へ移動できなかった場合もエラーを表示するが、成果物の出力は続行する
-- `GH_SECRETS_WRITE_PAT` が未設定または無効な場合や、GitHub Secret の更新に
-失敗した場合は警告を表示する。取得済みのアクセストークンによる PDF 変換と
-成果物の公開は続行する

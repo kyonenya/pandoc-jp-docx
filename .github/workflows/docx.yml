@@ -88,10 +88,10 @@ jobs:
 
           [ ! -s "$MS_REFRESH_TOKEN_OUTPUT_PATH" ] && exit 0
           [ -z "$GH_TOKEN" ] \
-            && echo '::warning::gh_secrets_write_patが設定されていないため、MS_REFRESH_TOKENを自動更新できません' && exit 0
+            && echo '::warning::gh_secrets_write_pat is not configured; automatic refresh is skipped' && exit 0
 
           gh secret set MS_REFRESH_TOKEN --repo "$GITHUB_REPOSITORY" < "$MS_REFRESH_TOKEN_OUTPUT_PATH" \
-            || echo '::warning::MS_REFRESH_TOKENの自動更新に失敗しました。成果物の公開処理を続行します'
+            || echo '::warning::Could not update MS_REFRESH_TOKEN; automatic refresh is skipped'
 
       - name: Publish documents
         env:

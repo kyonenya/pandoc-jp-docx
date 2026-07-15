@@ -16,12 +16,13 @@
 - `--no-postprocess` を指定すると `postprocess/numbering.sh` を実行しない。
 - workflow 側は `output_name` から `caller/dist/<output_name>.docx` を組み立て、`build.sh` へ渡す。
 - `postprocess/pdf.mts` で、Microsoft Graph API を使って DOCX を PDF に変換する。
-  - `get-refresh-token.sh` で初回のリフレッシュトークンを取得する。
+  - エラー時も best-effort で処理を継続し、生成できた PDF や、あるいは DOCX だけでも成果物ブランチへの公開を続行する。
+- `get-refresh-token.sh` で PDF 変換用の初回のリフレッシュトークンを取得する。
 
 ## コード規約
 
-- 一回しか使われない関数や変数は切り出さずにインラインで書けるか検討して
-- 一行で書けるものは一行で書いて
+- 一回しか使われない関数や変数は切り出さずにインラインで書けるか検討すること。
+- 一行で書けるものは一行で書けないか検討すること。
 - 命名規則
   - パスを表す名前には `path` を使う。`path = dir + file` である。
   - ディレクトリを表す名前には `dir` を使う。

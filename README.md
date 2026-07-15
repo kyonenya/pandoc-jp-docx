@@ -102,7 +102,7 @@ jobs:
 
 ### PDF も出力する
 
-生成した DOCX を PDF に変換できる。Microsoft Graph API と個人用 OneDrive を使用する。
+生成した DOCX を PDF に変換できる。個人用 OneDrive アカウントと Microsoft Graph API を使用する。
 
 ```yaml
 jobs:
@@ -118,10 +118,9 @@ jobs:
       gh_secrets_write_pat: ${{ secrets.GH_SECRETS_WRITE_PAT }}
 ```
 
-- `pdf: true` の場合、`<output_name>.pdf` を出力する
+- `pdf` が `true` の場合、`<output_name>.pdf` を出力する
 
-Entra アプリの登録とリフレッシュトークンの取得方法は
-[PDF 出力の設定](docs/postprocess-pdf.md)を参照する。
+Entra アプリの登録とリフレッシュトークンの取得方法は [PDF 出力の設定](docs/postprocess-pdf.md) を参照のこと。
 
 ## ローカルでの使い方
 

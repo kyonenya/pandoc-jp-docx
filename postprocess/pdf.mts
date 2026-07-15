@@ -70,17 +70,15 @@ async function main(
   if (refreshTokenOutputPath) {
     if (!refresh_token) {
       console.error(
-        'The authentication response has no new refresh token; automatic refresh is disabled',
+        'The authentication response has no new refresh token; automatic refresh is skipped',
       );
     } else {
       try {
         await mkdir(dirname(refreshTokenOutputPath), { recursive: true });
-        await writeFile(refreshTokenOutputPath, refresh_token, {
-          mode: 0o600,
-        });
+        await writeFile(refreshTokenOutputPath, refresh_token, { mode: 0o600 });
       } catch (error) {
         console.error(
-          `Could not save the refresh token; automatic refresh is disabled: ${error instanceof Error ? error.message : String(error)}`,
+          `Could not save the refresh token; automatic refresh is skipped: ${error instanceof Error ? error.message : String(error)}`,
         );
       }
     }
@@ -104,7 +102,7 @@ async function main(
           'Content-Type':
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         },
-        body: Uint8Array.from(await readFile(inputPath)),
+        body: await readFile(inputPath),
       },
       access_token,
     ),
