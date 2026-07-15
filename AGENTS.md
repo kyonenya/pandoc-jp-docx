@@ -1,8 +1,6 @@
 # AGENTS.md
 
 - 応答は日本語で行う。
-- 変更前に `rg` / `rg --files` で既存構成を確認し、無関係な差分や staged 済みの変更は戻さない。
-- 手編集は原則 `apply_patch` を使う。
 
 ## このリポジトリの構成
 
@@ -17,14 +15,20 @@
 - `build.sh` の引数順は `input_pattern output_path [--defaults=path] [--no-postprocess]` である。`output_path` は必須であり、`defaults` は任意である。
 - `--no-postprocess` を指定すると `postprocess/numbering.sh` を実行しない。
 - workflow 側は `output_name` から `caller/dist/<output_name>.docx` を組み立て、`build.sh` へ渡す。
+- `postprocess/pdf.mts` で、Microsoft Graph API を使って DOCX を PDF に変換する。
+  - エラー時も best-effort で処理を継続し、生成できた PDF や、あるいは DOCX だけでも成果物ブランチへの公開を続行する。
+- `get-refresh-token.sh` で PDF 変換用の初回のリフレッシュトークンを取得する。
 
-## 命名規則
+## コード規約
 
-- パスを表す名前には `path` を使う。`path = dir + file` である。
-- ディレクトリを表す名前には `dir` を使う。
-- ファイルを表す名前には `file` を使う。`file = name + ext` である。
-- 拡張子を含まない名前には `name` を使う。
-- 拡張子を表す名前には `ext` を使う。
+- 一回しか使われない関数や変数は切り出さずにインラインで書けるか検討すること。
+- 一行で書けるものは一行で書けないか検討すること。
+- 命名規則
+  - パスを表す名前には `path` を使う。`path = dir + file` である。
+  - ディレクトリを表す名前には `dir` を使う。
+  - ファイルを表す名前には `file` を使う。`file = name + ext` である。
+  - 拡張子を含まない名前には `name` を使う。
+  - 拡張子を表す名前には `ext` を使う。
 
 ## 検証
 

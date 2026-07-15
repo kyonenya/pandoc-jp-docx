@@ -13,6 +13,17 @@ on:
         required: false
         type: string
         default: ''
+      pdf:
+        required: false
+        type: boolean
+        default: false
+    secrets:
+      ms_client_id:
+        required: false
+      ms_refresh_token:
+        required: false
+      gh_secrets_write_pat:
+        required: false
 
 permissions:
   contents: write
@@ -58,7 +69,31 @@ jobs:
       - name: Postprocess DOCX numbering
         run: ./postprocess/numbering.sh "caller/dist/${{ inputs.output_name }}.docx"
 
-      - name: Publish DOCX
+      - name: Convert DOCX to PDF
+        if: ${{ inputs.pdf }}
+        continue-on-error: true
+        env:
+          MS_CLIENT_ID: ${{ secrets.ms_client_id }}
+          MS_REFRESH_TOKEN: ${{ secrets.ms_refresh_token }}
+          MS_REFRESH_TOKEN_OUTPUT_PATH: ${{ runner.temp }}/ms-refresh-token
+        run: node ./postprocess/pdf.mts "caller/dist/${{ inputs.output_name }}.docx" "caller/dist/${{ inputs.output_name }}.pdf"
+
+      - name: Update Microsoft refresh token
+        if: ${{ inputs.pdf }}
+        env:
+          GH_TOKEN: ${{ secrets.gh_secrets_write_pat }}
+          MS_REFRESH_TOKEN_OUTPUT_PATH: ${{ runner.temp }}/ms-refresh-token
+        run: |
+          trap 'rm -f "$MS_REFRESH_TOKEN_OUTPUT_PATH"' EXIT
+
+          [ ! -s "$MS_REFRESH_TOKEN_OUTPUT_PATH" ] && exit 0
+          [ -z "$GH_TOKEN" ] \
+            && echo '::warning::gh_secrets_write_pat is not configured; automatic refresh is skipped' && exit 0
+
+          gh secret set MS_REFRESH_TOKEN --repo "$GITHUB_REPOSITORY" < "$MS_REFRESH_TOKEN_OUTPUT_PATH" \
+            || echo '::warning::Could not update MS_REFRESH_TOKEN; automatic refresh is skipped'
+
+      - name: Publish documents
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -69,7 +104,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add .
-          git commit -m "Publish DOCX: ${{ github.sha }}"
+          git commit -m "Publish documents: ${{ github.sha }}"
 
           gh auth setup-git
           git remote add origin "https://github.com/${{ github.repository }}.git"
