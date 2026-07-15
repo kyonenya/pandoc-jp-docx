@@ -102,7 +102,7 @@ jobs:
 
 ### PDF も出力する
 
-Microsoft Graph API と個人用 OneDrive を使って、生成した DOCX を PDF に変換できる。
+生成した DOCX を PDF に変換できる。Microsoft Graph API と個人用 OneDrive を使用する。
 
 ```yaml
 jobs:
@@ -118,17 +118,10 @@ jobs:
       gh_secrets_write_pat: ${{ secrets.GH_SECRETS_WRITE_PAT }}
 ```
 
-- `pdf` のデフォルトは `false`
-- `pdf: true` の場合は `<output_name>.docx` と `<output_name>.pdf` を出力する
-- PDF 変換に失敗した場合も DOCX は出力する
-- OneDrive にアップロードした DOCX は、PDF 変換後にごみ箱へ移動を試みる
-- クライアント ID とリフレッシュトークンは、呼び出し側リポジトリの Secrets に設定する
-- リフレッシュトークンの自動更新には、GitHub Secret 更新用 PAT を使用する
-- PDF 変換時に新しいリフレッシュトークンを取得し、呼び出し側リポジトリの Secret を自動更新する
-- PAT が未設定または無効な場合は警告を表示し、PDF 変換と成果物の公開を続行する
+- `pdf: true` の場合、`<output_name>.pdf` を出力する
 
 Entra アプリの登録とリフレッシュトークンの取得方法は
-[PDF 出力の設定](docs/pdf.md)を参照する。
+[PDF 出力の設定](docs/postprocess-pdf.md)を参照する。
 
 ## ローカルでの使い方
 
