@@ -6,18 +6,16 @@ import { dirname } from 'node:path';
 async function ok(response: Response, operation: string): Promise<Response> {
   if (response.ok) return response;
 
-  const text = await response.text();
-  let message = text || `HTTP ${response.status}`;
-  try {
-    // OAuth トークンエンドポイントは { error: string, error_description }、Graph API は { error: { message } }
-    const body = JSON.parse(text);
-    message =
-      body.error_description ??
-      (typeof body.error === 'string' ? body.error : body.error?.message) ??
-      message;
-  } catch {}
+  const body: {
+    error?: string /* OAuth */ | { message?: string } /* Graph API */;
+    error_description?: string; // OAuth
+  } | null = await response.json().catch(() => null);
+  const message =
+    body?.error_description ??
+    (typeof body?.error === 'string' ? body.error : body?.error?.message) ??
+    `HTTP ${response.status}`;
 
-  throw new Error(`${operation}: ${message}`);
+  throw new Error(`Failed to ${operation}: ${message}`);
 }
 
 async function json<T>(response: Response, operation: string): Promise<T> {
@@ -37,6 +35,25 @@ function graphRequest(
   });
 }
 
+function oauthRequest(
+  clientId: string,
+  refreshToken: string,
+): Promise<Response> {
+  return fetch(
+    'https://login.microsoftonline.com/consumers/oauth2/v2.0/token',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id: clientId,
+        refresh_token: refreshToken,
+        grant_type: 'refresh_token',
+        scope: 'https://graph.microsoft.com/Files.ReadWrite offline_access',
+      }),
+    },
+  );
+}
+
 async function main(
   inputPath: string,
   outputPath: string,
@@ -47,24 +64,13 @@ async function main(
   const { access_token, refresh_token } = await json<{
     access_token: string;
     refresh_token?: string;
-  }>(
-    await fetch(
-      'https://login.microsoftonline.com/consumers/oauth2/v2.0/token',
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          client_id: clientId,
-          refresh_token: refreshToken,
-          grant_type: 'refresh_token',
-          scope: 'https://graph.microsoft.com/Files.ReadWrite offline_access',
-        }),
-      },
-    ),
-    'アクセストークンの取得に失敗しました',
-  );
+  }>(await oauthRequest(clientId, refreshToken), 'get an access token');
   if (refreshTokenOutputPath) {
-    if (refresh_token) {
+    if (!refresh_token) {
+      console.error(
+        'The authentication response has no new refresh token; automatic refresh is disabled',
+      );
+    } else {
       try {
         await mkdir(dirname(refreshTokenOutputPath), { recursive: true });
         await writeFile(refreshTokenOutputPath, refresh_token, {
@@ -72,13 +78,9 @@ async function main(
         });
       } catch (error) {
         console.error(
-          `リフレッシュトークンを一時保存できないため、自動更新できません: ${error instanceof Error ? error.message : String(error)}`,
+          `Could not save the refresh token; automatic refresh is disabled: ${error instanceof Error ? error.message : String(error)}`,
         );
       }
-    } else {
-      console.error(
-        '認証応答に新しいリフレッシュトークンがないため、自動更新できません',
-      );
     }
   }
 
@@ -94,7 +96,7 @@ async function main(
       {},
       access_token,
     ),
-    'OneDriveのアプリフォルダ取得に失敗しました',
+    'get the OneDrive app folder',
   );
 
   const { id: itemId } = await json<{ id: string }>(
@@ -110,7 +112,7 @@ async function main(
       },
       access_token,
     ),
-    'DOCXのアップロードに失敗しました',
+    'upload the DOCX',
   );
   try {
     const pdf = await ok(
@@ -119,7 +121,7 @@ async function main(
         {},
         access_token,
       ),
-      'PDF変換に失敗しました',
+      'convert to PDF',
     );
 
     await mkdir(dirname(outputPath), { recursive: true });
@@ -132,7 +134,7 @@ async function main(
           { method: 'POST', headers: { Accept: 'application/json' } },
           access_token,
         ),
-        'アップロードしたDOCXの完全削除に失敗しました',
+        'delete the uploaded DOCX',
       );
     } catch (error) {
       console.error(error instanceof Error ? error.message : String(error));
@@ -149,11 +151,11 @@ if (args.length !== 2) {
 const clientId = process.env.MS_CLIENT_ID;
 const refreshToken = process.env.MS_REFRESH_TOKEN;
 if (!clientId) {
-  console.error('MS_CLIENT_IDを設定してください');
+  console.error('Set MS_CLIENT_ID');
   process.exit(1);
 }
 if (!refreshToken) {
-  console.error('MS_REFRESH_TOKENを設定してください');
+  console.error('Set MS_REFRESH_TOKEN');
   process.exit(1);
 }
 
