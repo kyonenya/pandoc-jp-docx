@@ -22,8 +22,7 @@ Microsoft Entra 管理センターでアプリを登録する。
 `curl` と `jq` をインストールし、このリポジトリで次のコマンドを実行する。
 
 ```sh
-MS_CLIENT_ID='<クライアントID>' \
-  ./get-refresh-token.sh
+./get-refresh-token.sh '<クライアントID>'
 ```
 
 表示された URL を開いてコードを入力し、PDF 変換に使う個人 Microsoft
@@ -34,8 +33,7 @@ MS_CLIENT_ID='<クライアントID>' \
 登録する場合は次のように実行する。
 
 ```sh
-MS_CLIENT_ID='<クライアントID>' \
-  ./get-refresh-token.sh \
+./get-refresh-token.sh '<クライアントID>' \
   | gh secret set MS_REFRESH_TOKEN --repo '<owner/repository>'
 ```
 

@@ -2,11 +2,10 @@
 
 set -euo pipefail
 
-: "${MS_CLIENT_ID:?MS_CLIENT_IDを設定してください}"
-
+ms_client_id=${1:?Usage: $0 ms_client_id}
 auth_url='https://login.microsoftonline.com/consumers/oauth2/v2.0'
 response=$(curl --fail --silent --show-error \
-  --data-urlencode "client_id=$MS_CLIENT_ID" \
+  --data-urlencode "client_id=$ms_client_id" \
   --data-urlencode 'scope=https://graph.microsoft.com/Files.ReadWrite offline_access' \
   "$auth_url/devicecode")
 
@@ -17,7 +16,7 @@ interval=$(jq -r '.interval // 5' <<<"$response")
 while true; do
   sleep "$interval"
   response=$(curl --silent --show-error \
-    --data-urlencode "client_id=$MS_CLIENT_ID" \
+    --data-urlencode "client_id=$ms_client_id" \
     --data-urlencode "device_code=$device_code" \
     --data-urlencode 'grant_type=urn:ietf:params:oauth:grant-type:device_code' \
     "$auth_url/token")

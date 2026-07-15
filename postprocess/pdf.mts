@@ -3,43 +3,38 @@ import { randomUUID } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
 
-interface ResponseBody {
-  access_token?: unknown;
-  error?: string | { message?: string };
-  error_description?: string;
-  id?: unknown;
-  parentReference?: { driveId?: unknown };
-  refresh_token?: unknown;
-}
+async function ok(response: Response, operation: string): Promise<Response> {
+  if (response.ok) return response;
 
-function errorMessage(body: ResponseBody, fallback: string): string {
-  if (body.error_description) return body.error_description;
-  if (typeof body.error === 'string') return body.error;
-  return body.error?.message ?? fallback;
-}
-
-async function responseBody(response: Response): Promise<ResponseBody> {
   const text = await response.text();
-  if (text === '') return {};
-
+  let message = text || `HTTP ${response.status}`;
   try {
-    return JSON.parse(text) as ResponseBody;
-  } catch {
-    return { error: text };
-  }
+    // OAuth トークンエンドポイントは { error: string, error_description }、Graph API は { error: { message } }
+    const body = JSON.parse(text);
+    message =
+      body.error_description ??
+      (typeof body.error === 'string' ? body.error : body.error?.message) ??
+      message;
+  } catch {}
+
+  throw new Error(`${operation}: ${message}`);
 }
 
-async function expectedBody(
-  response: Response,
-  operation: string,
-): Promise<ResponseBody> {
-  const body = await responseBody(response);
-  if (!response.ok) {
-    throw new Error(
-      `${operation}: ${errorMessage(body, `HTTP ${response.status}`)}`,
-    );
-  }
-  return body;
+async function json<T>(response: Response, operation: string): Promise<T> {
+  return (await ok(response, operation)).json() as Promise<T>;
+}
+
+function graphRequest(
+  path: string,
+  options: RequestInit,
+  accessToken: string,
+): Promise<Response> {
+  const headers = new Headers(options.headers);
+  headers.set('Authorization', `Bearer ${accessToken}`);
+  return fetch(`https://graph.microsoft.com/v1.0${path}`, {
+    ...options,
+    headers,
+  });
 }
 
 async function main(
@@ -49,31 +44,30 @@ async function main(
   refreshToken: string,
   refreshTokenOutputPath?: string,
 ): Promise<void> {
-  const tokenResponse = await fetch(
-    'https://login.microsoftonline.com/consumers/oauth2/v2.0/token',
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        client_id: clientId,
-        refresh_token: refreshToken,
-        grant_type: 'refresh_token',
-        scope: 'https://graph.microsoft.com/Files.ReadWrite offline_access',
-      }),
-    },
-  );
-  const tokenBody = await expectedBody(
-    tokenResponse,
+  const { access_token, refresh_token } = await json<{
+    access_token: string;
+    refresh_token?: string;
+  }>(
+    await fetch(
+      'https://login.microsoftonline.com/consumers/oauth2/v2.0/token',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          client_id: clientId,
+          refresh_token: refreshToken,
+          grant_type: 'refresh_token',
+          scope: 'https://graph.microsoft.com/Files.ReadWrite offline_access',
+        }),
+      },
+    ),
     'アクセストークンの取得に失敗しました',
   );
-  if (typeof tokenBody.access_token !== 'string') {
-    throw new Error('認証応答にアクセストークンがありません');
-  }
   if (refreshTokenOutputPath) {
-    if (typeof tokenBody.refresh_token === 'string') {
+    if (refresh_token) {
       try {
         await mkdir(dirname(refreshTokenOutputPath), { recursive: true });
-        await writeFile(refreshTokenOutputPath, tokenBody.refresh_token, {
+        await writeFile(refreshTokenOutputPath, refresh_token, {
           mode: 0o600,
         });
       } catch (error) {
@@ -88,84 +82,56 @@ async function main(
     }
   }
 
-  const accessToken = tokenBody.access_token;
-  const graphRequest = (path: string, options: RequestInit = {}) => {
-    const headers = new Headers(options.headers);
-    headers.set('Authorization', `Bearer ${accessToken}`);
-    return fetch(`https://graph.microsoft.com/v1.0${path}`, {
-      ...options,
-      headers,
-    });
-  };
-  const getDriveId = async () => {
-    const response = await graphRequest('/me/drive?$select=id');
-    const body = await expectedBody(
-      response,
-      'OneDriveのドライブID取得に失敗しました',
-    );
-    if (typeof body.id !== 'string') {
-      throw new Error('OneDriveのドライブIDを取得できませんでした');
-    }
-    return body.id;
-  };
-
-  const appRootResponse = await graphRequest(
-    '/me/drive/special/approot?$select=id',
-  );
-  const appRootBody = await expectedBody(
-    appRootResponse,
+  const {
+    id: appRootId,
+    parentReference: { driveId },
+  } = await json<{
+    id: string;
+    parentReference: { driveId: string };
+  }>(
+    await graphRequest(
+      '/me/drive/special/approot?$select=id,parentReference',
+      {},
+      access_token,
+    ),
     'OneDriveのアプリフォルダ取得に失敗しました',
   );
-  if (typeof appRootBody.id !== 'string') {
-    throw new Error('OneDriveのアプリフォルダIDを取得できませんでした');
-  }
 
-  const uploadResponse = await graphRequest(
-    `/me/drive/items/${encodeURIComponent(appRootBody.id)}:/${randomUUID()}.docx:/content`,
-    {
-      method: 'PUT',
-      headers: {
-        'Content-Type':
-          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  const { id: itemId } = await json<{ id: string }>(
+    await graphRequest(
+      `/me/drive/items/${encodeURIComponent(appRootId)}:/${randomUUID()}.docx:/content`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type':
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        },
+        body: Uint8Array.from(await readFile(inputPath)),
       },
-      body: Uint8Array.from(await readFile(inputPath)),
-    },
-  );
-  const uploadBody = await expectedBody(
-    uploadResponse,
+      access_token,
+    ),
     'DOCXのアップロードに失敗しました',
   );
-  if (typeof uploadBody.id !== 'string') {
-    throw new Error('アップロードしたDOCXのアイテムIDを取得できませんでした');
-  }
-
-  const itemId = uploadBody.id;
-  const driveId =
-    typeof uploadBody.parentReference?.driveId === 'string'
-      ? uploadBody.parentReference.driveId
-      : undefined;
   try {
-    const pdfResponse = await graphRequest(
-      `/me/drive/items/${encodeURIComponent(itemId)}/content?format=pdf`,
+    const pdf = await ok(
+      await graphRequest(
+        `/me/drive/items/${encodeURIComponent(itemId)}/content?format=pdf`,
+        {},
+        access_token,
+      ),
+      'PDF変換に失敗しました',
     );
-    if (!pdfResponse.ok) {
-      const body = await responseBody(pdfResponse);
-      throw new Error(
-        `PDF変換に失敗しました: ${errorMessage(body, `HTTP ${pdfResponse.status}`)}`,
-      );
-    }
 
     await mkdir(dirname(outputPath), { recursive: true });
-    await writeFile(outputPath, Buffer.from(await pdfResponse.arrayBuffer()));
+    await writeFile(outputPath, Buffer.from(await pdf.arrayBuffer()));
   } finally {
     try {
-      const deleteDriveId = driveId ?? (await getDriveId());
-      const deleteResponse = await graphRequest(
-        `/drives/${encodeURIComponent(deleteDriveId)}/items/${encodeURIComponent(itemId)}/permanentDelete`,
-        { method: 'POST', headers: { Accept: 'application/json' } },
-      );
-      await expectedBody(
-        deleteResponse,
+      await ok(
+        await graphRequest(
+          `/drives/${encodeURIComponent(driveId)}/items/${encodeURIComponent(itemId)}/permanentDelete`,
+          { method: 'POST', headers: { Accept: 'application/json' } },
+          access_token,
+        ),
         'アップロードしたDOCXの完全削除に失敗しました',
       );
     } catch (error) {
