@@ -1,8 +1,6 @@
 # pandoc-ja-docx
 
-ルビ・傍点・セクション区切りなどに対応した、日本語組版向け Word 文書を [Pandoc](https://github.com/jgm/pandoc) で変換するためのワークフロー
-
-GitHub Actions、およびローカルの両方で使用できる。
+ルビ・傍点・セクション区切りなどに対応した、日本語組版向け Word 文書を [Pandoc](https://github.com/jgm/pandoc) で変換するための GitHub Actions ワークフロー
 
 ## スタイル
 
@@ -102,7 +100,7 @@ jobs:
 
 ### PDF も出力する
 
-生成した DOCX を PDF に変換できる。個人用 OneDrive アカウントと Microsoft Graph API が必要となる。
+生成した DOCX を PDF に変換できる。
 
 ```yaml
 jobs:
@@ -117,6 +115,8 @@ jobs:
 
 - `pdf` が `true` の場合、`<output_name>.pdf` を出力する
 - `secrets` には `inherit` を指定し、呼び出し側リポジトリの Actions Secrets を継承させる
+
+個人用 OneDrive アカウントと Microsoft Graph API が必要となる。
 
 セットアップの手順については [PDF 出力の設定](docs/postprocess-pdf.md) を参照のこと。
 

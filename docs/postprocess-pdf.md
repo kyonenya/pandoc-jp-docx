@@ -4,17 +4,23 @@
 
 PDF 変換時に Microsoft から取得した新しいリフレッシュトークンをもとに、呼び出し側リポジトリの `MS_REFRESH_TOKEN` を自己更新する。
 
-以下の3つの値を呼び出し側リポジトリの Actions Secrets に登録することで使用できる。
+## 必要な値
+
+以下の 3 つの値を呼び出し側リポジトリの Actions Secrets に登録することで使用できる。
 
 1. [`MS_CLIENT_ID`](#1-entra-アプリを登録する): Entra アプリのクライアント ID
-2. [`MS_REFRESH_TOKEN`](#2-初回用のリフレッシュトークンを取得する): PDF 変換に使用するリフレッシュトークン（初回用、2回目以降は自動更新される）
+2. [`MS_REFRESH_TOKEN`](#2-初回用のリフレッシュトークンを取得する): Microsoft Graph API のリフレッシュトークン（初回用、2 回目以降は自動更新される）
 3. [`GH_SECRETS_WRITE_PAT`](#3-github-secret-更新用-pat-を登録する): GitHub Secrets を更新するための personal access token
 
-ブラウザ上で登録する場合は、呼び出し側リポジトリの Settings > Secrets and variables > Actions を開き、Repository secrets に値を追加する。
+ブラウザ上で登録する場合は、呼び出し側リポジトリの
+
+Settings > Secrets and variables > Actions
+
+を開き、Repository secrets に値を追加する。
 
 ## 1. Entra アプリを登録する
 
-[Microsoft Entra 管理センター](https://entra.microsoft.com/)でアプリを登録する。
+[Microsoft Entra 管理センター](https://entra.microsoft.com/) でアプリを登録する。
 
 - 名前: `pandoc-jp-docx`
 - サポートされているアカウントの種類: 個人用 Microsoft アカウントのみ
@@ -23,7 +29,7 @@ PDF 変換時に Microsoft から取得した新しいリフレッシュトー�
 - Microsoft Graph の委任されたアクセス許可: `Files.ReadWrite.AppFolder`
 - （クライアントシークレットは作成しない）
 
-登録後、アプリケーション ID （クライアント ID）をコピーして `MS_CLIENT_ID` という名前で Secrets に登録する。
+登録後、アプリケーション ID（クライアント ID）をコピーして `MS_CLIENT_ID` という名前で Secrets に登録する。
 
 ```bash
 gh secret set MS_CLIENT_ID --repo 'owner/repository'
@@ -31,9 +37,9 @@ gh secret set MS_CLIENT_ID --repo 'owner/repository'
 
 ## 2. 初回用のリフレッシュトークンを取得する
 
-`curl` と `jq` をインストールし、次のコマンドをクライアント ID を書き換えたうえで実行する。
+`curl` と `jq` をインストールし、次のコマンドを `<クライアントID>` の部分を書き換えて実行する。
 
-表示された URL を開いてコードを入力し、PDF 変換に使う個人 Microsoft アカウントでサインインする。
+表示された URL を開いてコードを入力し、個人 Microsoft アカウントでサインインする。
 
 ```bash
 bash <<'SH'
@@ -88,9 +94,7 @@ gh secret set MS_REFRESH_TOKEN --repo 'owner/repository'
 - Selected repositories: reusable workflow を利用するリポジトリ
 - Repository permissions: `Secrets` に `Read and write` を選択
 
-同じ resource owner の複数リポジトリで使用する場合は、1 つの PAT で対象の
-リポジトリを複数選択できる。resource owner が異なる場合は owner ごとに PAT を
-作成する。
+1 つの PAT で同じ owner の複数のリポジトリを選択できる。
 
 作成後、PAT をコピーして `GH_SECRETS_WRITE_PAT` という名前で呼び出し側リポジトリへ登録する。
 
