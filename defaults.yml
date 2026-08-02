@@ -2,7 +2,6 @@ standalone: true
 to: docx
 reference-doc: reference.docx
 filters:
-  - filters/boten.lua
+  - filters/str_rules.lua
   - filters/ruby.lua
-  - filters/half-width.lua
   - filters/breaks.lua

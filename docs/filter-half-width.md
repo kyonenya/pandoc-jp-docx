@@ -101,6 +101,8 @@ AST:       [ Str "日本語", Space, Str "X′", Space, Str "の続き" ]
 
 これは「日本語と隣接する Ambiguous 文字は全角寄りに描画したい」という妥当な意図に基づく自動判定だが、これが揺れの原因となる。
 
+ただし Lua フィルターが `Str` を分割して `RawInline` を挟むと、後続の `Str` に hint が付かないことがある。`世界(2)において` を [`filters/str_rules.lua`](../filters/str_rules.lua) に通すと `Str "において"` の run には付かないが、`(2)世界において` では `Str "世界において"` に付く。条件は特定できていない。Ambiguous 文字の幅を確実に固定するには、この自動付与に頼らず run に hint を明示する。
+
 ## 4. 相互作用がもたらす表示の揺れ
 
 以上の三つを組み合わせると、Ambiguous 文字の表示幅は **その文字を含む `Str` の構成によって決まる**。同一文書内で同じ Ambiguous 文字が、文脈によって全角になったり半角になったりという挙動が生じる。
@@ -150,6 +152,8 @@ Ambiguous 文字の表示幅を意図通りに固定したい場合、対象文�
 - **全角に固定したい場合**：`<w:rFonts w:hint="eastAsia"/>` を付けた run に包む。Ambiguous 文字は `w:eastAsia` 側に倒れ、全角字形となる。
 
 Pandoc 上では Lua フィルターを用いて、`Str` 要素を走査し、対象文字を `RawInline('openxml', ...)` に置換することでこれを実現できる ([Pandoc Lua Filters](https://pandoc.org/lua-filters.html))。対象文字に遭遇したら、その前後で `Str` を切り、対象文字だけを独立した raw run として挿入する、という構造になる。
+
+この方式では、切り出した run に親のインライン要素の書式（斜体・取り消し線・リンクの文字スタイル等）が入らない。詳細は [filter-spacing.md](filter-spacing.md) の「既知の制限」を参照。
 
 なお、reference.docx 側でフォントを定義しているなら、`w:rFonts` でフォント名まで明示する必要はない。`w:hint` の値だけを上書きすれば、フォントは reference.docx の既定値が継承される。
 

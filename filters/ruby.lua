@@ -35,45 +35,47 @@ local function make_ruby_xml(conf, base, ruby)
   )
 end
 
-local function Str_factory(conf)
-  -- text -> [Str, RawInline, Str]
-  local function expand_ruby(text)
-    local before, base, ruby, after = text:match('(.-)' .. ruby_pattern .. '(.*)')
-    if not base then return nil end
+-- text -> [Str, RawInline, Str]
+local function expand_ruby(text, conf)
+  local before, base, ruby, after = text:match('(.-)' .. ruby_pattern .. '(.*)')
+  if not base then return nil end
 
-    local inlines = pandoc.List()
+  local inlines = pandoc.List()
 
-    if #before > 0 then
-      inlines:insert(pandoc.Str(before))
-    end
-    inlines:insert(pandoc.RawInline('openxml', make_ruby_xml(conf, base, ruby)))
+  if #before > 0 then
+    inlines:insert(pandoc.Str(before))
+  end
+  inlines:insert(pandoc.RawInline('openxml', make_ruby_xml(conf, base, ruby)))
 
-    local after_inlines = expand_ruby(after) -- recursive
-    if after_inlines then
-      inlines:extend(after_inlines)
-    elseif #after > 0 then
-      inlines:insert(pandoc.Str(after))
-    end
-
-    return inlines
+  local after_inlines = expand_ruby(after, conf) -- recursive
+  if after_inlines then
+    inlines:extend(after_inlines)
+  elseif #after > 0 then
+    inlines:insert(pandoc.Str(after))
   end
 
-  return function(elem)
-    if FORMAT ~= 'docx' then return nil end
-
-    return expand_ruby(elem.text)
-  end
+  return inlines
 end
 
 return {
   {
-    -- 先に脚注内のルビ Str を RawInline に置換しておく
+    -- replace ruby inside Note first, so the Str pass won't reach them
     Note = function(note)
-      note.content = note.content:walk({ Str = Str_factory(footnote_config) })
+      note.content = note.content:walk({
+        Str = function(elem)
+          if FORMAT ~= 'docx' then return nil end
+
+          return expand_ruby(elem.text, footnote_config)
+        end,
+      })
       return note
     end,
   },
   {
-    Str = Str_factory(body_config),
+    Str = function(elem)
+      if FORMAT ~= 'docx' then return nil end
+
+      return expand_ruby(elem.text, body_config)
+    end,
   },
 }
