@@ -1,7 +1,6 @@
 -- Word の「文字書式」（OOXML の w:rPr）を指定した run を組み立てる
 -- 1. 傍点 (w:em): 日本語を含む **強調** を丸傍点にする
 -- 2. 半角幅の固定 (w:rFonts): Ambiguous 幅の文字を半角で表示させる
---    curl -L https://emonkak.pages.dev/articles/wcwidth/ambiguous_width_characters.txt | awk -F '\t' 'NR == 1 || $NF == "A"'
 -- 3. 和欧間アキ (w:spacing): 記号が挟まると Word が入れてくれないアキを補う
 
 local boten = '<w:em w:val="dot"/>' -- 丸傍点。ゴマ傍点は "comma"
@@ -35,6 +34,13 @@ local function contains_japanese(text)
   return false
 end
 
+-- 文字の境界にアキが要るか。記号が挟まると Word の自動アキが効かないので補う
+local function needs_spacing(left, right)
+  if left == nil or right == nil then return false end
+  return (rules[left] ~= nil and is_japanese(right)) -- 記号 → 和文
+      or (is_japanese(left) and rules[right] ~= nil) -- 和文 → 記号
+end
+
 local function make_run(rpr, text)
   return string.format(
     '<w:r><w:rPr>%s</w:rPr><w:t xml:space="preserve">%s</w:t></w:r>',
@@ -55,17 +61,11 @@ local function split_runs(text)
 
   for i, char in ipairs(chars) do
     local hint = rules[char] -- nil なら対象外、false なら hint 指定なし
-    local next_char = chars[i + 1]
-    local rpr = ''
-
-    if hint ~= nil then
-      -- 対象文字。右隣が和文ならアキを付ける
-      rpr = (hint and string.format('<w:rFonts w:hint="%s"/>', hint) or '')
-        .. (next_char and is_japanese(next_char) and spacing or '')
-    elseif next_char and rules[next_char] ~= nil and is_japanese(char) then
-      -- 対象文字の左隣の和文。この 1 文字だけ別 run に切り出してアキを付ける
-      rpr = east_asia .. spacing
-    end
+    -- w:spacing は run 内の各文字の「後ろ」に入るので、境界の左側の文字に付ける
+    local gap = needs_spacing(char, chars[i + 1])
+    local rpr = (hint and string.format('<w:rFonts w:hint="%s"/>', hint) or '')
+      .. (gap and hint == nil and east_asia or '') -- 記号の左隣の和文。切り出すので hint を明示
+      .. (gap and spacing or '')
 
     if rpr == '' then
       plain = plain .. char
