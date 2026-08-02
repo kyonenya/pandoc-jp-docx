@@ -3,15 +3,18 @@
 -- 2. 半角幅の固定 (w:rFonts): Ambiguous 幅の文字を半角で表示させる
 -- 3. 和欧間アキ (w:spacing): 記号が挟まると Word が入れてくれないアキを補う
 
-local boten = '<w:em w:val="dot"/>' -- 丸傍点。ゴマ傍点は "comma"
-local spacing = '<w:spacing w:val="44"/>' -- 和欧間アキ 2.2pt
+local xml = {
+  boten = '<w:em w:val="dot"/>', -- 丸傍点。ゴマ傍点は "comma"
+  half_width = '<w:rFonts w:hint="default"/>', -- Ambiguous 幅を半角で描かせる
+  spacing = '<w:spacing w:val="44"/>', -- 和欧間アキ 2.2pt
+}
 
--- 対象文字 -> 半角幅を固定する hint（false は hint 指定なし）
-local rules = {
-  ['§'] = 'default',
-  ['′'] = 'default',
-  ['″'] = 'default',
-  ['‴'] = 'default',
+-- 和欧間アキの対象記号 -> 半角幅の固定が要るか
+local symbols = {
+  ['§'] = true,
+  ['′'] = true,
+  ['″'] = true,
+  ['‴'] = true,
   ['('] = false,
   [')'] = false,
 }
@@ -36,8 +39,8 @@ end
 -- 文字の境界にアキが要るか。記号が挟まると Word の自動アキが効かないので補う
 local function needs_spacing(left, right)
   if left == nil or right == nil then return false end
-  return (rules[left] ~= nil and is_japanese(right)) -- 記号 → 和文
-      or (is_japanese(left) and rules[right] ~= nil) -- 和文 → 記号
+  return (symbols[left] ~= nil and is_japanese(right)) -- 記号 → 和文
+      or (is_japanese(left) and symbols[right] ~= nil) -- 和文 → 記号
 end
 
 local function make_run(rpr, text)
@@ -59,11 +62,9 @@ local function split_runs(text)
   end
 
   for i, char in ipairs(chars) do
-    local hint = rules[char] -- nil なら対象外、false なら hint 指定なし
-    -- w:spacing は run 内の各文字の「後ろ」に入るので、境界の左側の文字に付ける
-    local gap = needs_spacing(char, chars[i + 1])
-    local rpr = (hint and string.format('<w:rFonts w:hint="%s"/>', hint) or '')
-      .. (gap and spacing or '')
+    local rpr = (symbols[char] and xml.half_width or '')
+      -- w:spacing は run 内の各文字の「後ろ」に入るので、境界の左側の文字に付ける
+      .. (needs_spacing(char, chars[i + 1]) and xml.spacing or '')
 
     if rpr == '' then
       plain = plain .. char
@@ -89,7 +90,7 @@ return {
 
       local runs = split_runs(text) or pandoc.List({ { text = text, rpr = '' } })
       return runs:map(function(run)
-        return pandoc.RawInline('openxml', make_run(run.rpr .. boten, run.text))
+        return pandoc.RawInline('openxml', make_run(run.rpr .. xml.boten, run.text))
       end)
     end,
   },
