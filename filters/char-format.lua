@@ -41,13 +41,6 @@ local function needs_spacing(left, right)
       or (is_japanese(left) and rules.spacing[right]) -- 和文 → 記号
 end
 
-local function make_run(rpr, text)
-  return string.format(
-    '<w:r><w:rPr>%s</w:rPr><w:t xml:space="preserve">%s</w:t></w:r>',
-    rpr, escape_xml(text)
-  )
-end
-
 -- text -> [{ text, rpr }]
 local function split_runs(text)
   local chars = {}
@@ -74,6 +67,13 @@ local function split_runs(text)
   if #runs == 0 then return nil end -- 対象文字なし。plain を flush する前に判定する
   flush()
   return runs
+end
+
+local function make_run(rpr, text)
+  return string.format(
+    '<w:r><w:rPr>%s</w:rPr><w:t xml:space="preserve">%s</w:t></w:r>',
+    rpr, escape_xml(text)
+  )
 end
 
 return {
