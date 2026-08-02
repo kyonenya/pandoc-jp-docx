@@ -153,6 +153,8 @@ Ambiguous 文字の表示幅を意図通りに固定したい場合、対象文�
 
 Pandoc 上では Lua フィルターを用いて、`Str` 要素を走査し、対象文字を `RawInline('openxml', ...)` に置換することでこれを実現できる ([Pandoc Lua Filters](https://pandoc.org/lua-filters.html))。対象文字に遭遇したら、その前後で `Str` を切り、対象文字だけを独立した raw run として挿入する、という構造になる。
 
+この方式では、切り出した run に親のインライン要素の書式（斜体・取り消し線・リンクの文字スタイル等）が入らない。詳細は [filter-spacing.md](filter-spacing.md) の「既知の制限」を参照。
+
 なお、reference.docx 側でフォントを定義しているなら、`w:rFonts` でフォント名まで明示する必要はない。`w:hint` の値だけを上書きすれば、フォントは reference.docx の既定値が継承される。
 
 ## 6. 対象文字を選ぶときの目安
