@@ -1,4 +1,4 @@
--- Word の文字書式 (OOXML の w:rPr) を指定した run (w:r) を組み立てる
+-- Word の文字書式 (OOXML の w:rPr) を指定して run (w:r) を組み立てる
 -- 1. 傍点: 日本語を含む **強調** を傍点にする
 -- 2. 半角幅の固定: Ambiguous 文字を半角幅で表示させる
 -- 3. 和欧間アキ: 記号が挟まると Word が入れてくれないアキを補う
@@ -33,34 +33,24 @@ local function needs_spacing(char, next_char)
       or (is_japanese(char) and rules.spacing[next_char]) -- 和文 → 記号
 end
 
-local function split_runs_by_rules(text) --> [{ text, rpr }] | nil
+local function split_runs_by_rules(text) --> [{ text, rpr }]
   local chars = {}
   for char in text:gmatch(utf8.charpattern) do chars[#chars + 1] = char end
 
   local runs = pandoc.List()
-  local plain = ''
-
-  local function flush()
-    if plain ~= '' then runs:insert({ text = plain, rpr = '' }) end
-    plain = ''
-  end
 
   for i, char in ipairs(chars) do
     local rpr = (rules.half_width[char] and xml.half_width or '')
       .. (needs_spacing(char, chars[i + 1]) and xml.spacing or '')
+    local last = runs[#runs]
 
-    if rpr == '' then
-      plain = plain .. char
+    if rpr == '' and last and last.rpr == '' then
+      last.text = last.text .. char -- 直前の書式なし run に続ける
     else
-      flush()
       runs:insert({ text = char, rpr = rpr })
     end
   end
 
-  -- 置換対象の文字がなかった場合
-  if #runs == 0 then return nil end -- plain を flush する前に判定する
-
-  flush()
   return runs
 end
 
@@ -86,9 +76,7 @@ return {
       local text = pandoc.utils.stringify(elem.content)
       if not contains_japanese(text) then return nil end
 
-      local runs = split_runs_by_rules(text) or pandoc.List({ { text = text, rpr = '' } })
-
-      return runs:map(function(run)
+      return split_runs_by_rules(text):map(function(run)
         return pandoc.RawInline('openxml', make_run(run.rpr .. xml.boten, run.text))
       end)
     end,
@@ -97,10 +85,7 @@ return {
     Str = function(elem)
       if FORMAT ~= 'docx' then return nil end
 
-      local runs = split_runs_by_rules(elem.text)
-      if not runs then return nil end
-
-      return runs:map(function(run)
+      return split_runs_by_rules(elem.text):map(function(run)
         return run.rpr == '' and pandoc.Str(run.text)
           or pandoc.RawInline('openxml', make_run(run.rpr, run.text))
       end)
