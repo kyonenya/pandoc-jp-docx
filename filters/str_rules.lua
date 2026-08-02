@@ -1,17 +1,17 @@
 -- Word の文字書式 (OOXML の w:rPr) を指定した run (w:r) を組み立てる
--- 1. 傍点: 日本語を含む **強調** を丸傍点にする
+-- 1. 傍点: 日本語を含む **強調** を傍点にする
 -- 2. 半角幅の固定: Ambiguous 文字を半角幅で表示させる
 -- 3. 和欧間アキ: 記号が挟まると Word が入れてくれないアキを補う
-
-local xml = {
-  boten = '<w:em w:val="dot"/>', -- 丸傍点（ゴマ傍点は "comma"）
-  half_width = '<w:rFonts w:hint="default"/>',
-  spacing = '<w:spacing w:val="44"/>', -- 和欧間アキ2.2pt
-}
 
 local rules = {
   half_width = { ['§'] = true, ['′'] = true, ['″'] = true, ['‴'] = true },
   spacing = { ['′'] = true, ['″'] = true, ['‴'] = true, ['('] = true, [')'] = true, },
+}
+
+local xml = {
+  boten = '<w:em w:val="dot"/>', -- 丸傍点（ゴマ傍点は "comma"）
+  half_width = '<w:rFonts w:hint="default"/>',
+  spacing = '<w:spacing w:val="44"/>', -- 2.2pt
 }
 
 local function is_japanese(char)
@@ -27,15 +27,13 @@ local function contains_japanese(text)
   return false
 end
 
--- 自身の後続する文字との境界にアキが要るかどうか
 local function needs_spacing(char, next_char)
   if next_char == nil then return false end
   return (rules.spacing[char] and is_japanese(next_char)) -- 記号 → 和文
       or (is_japanese(char) and rules.spacing[next_char]) -- 和文 → 記号
 end
 
--- 半角幅固定と和欧間アキ補正
-local function split_runs(text) --> [{ text, rpr }] | nil
+local function split_runs_by_rules(text) --> [{ text, rpr }] | nil
   local chars = {}
   for char in text:gmatch(utf8.charpattern) do chars[#chars + 1] = char end
 
@@ -88,7 +86,7 @@ return {
       local text = pandoc.utils.stringify(elem.content)
       if not contains_japanese(text) then return nil end
 
-      local runs = split_runs(text) or pandoc.List({ { text = text, rpr = '' } })
+      local runs = split_runs_by_rules(text) or pandoc.List({ { text = text, rpr = '' } })
 
       return runs:map(function(run)
         return pandoc.RawInline('openxml', make_run(run.rpr .. xml.boten, run.text))
@@ -99,7 +97,7 @@ return {
     Str = function(elem)
       if FORMAT ~= 'docx' then return nil end
 
-      local runs = split_runs(elem.text)
+      local runs = split_runs_by_rules(elem.text)
       if not runs then return nil end
 
       return runs:map(function(run)

@@ -10,9 +10,9 @@ pandoc Lua フィルターを複数組み合わせるとき、フィルター同
 
 | 分類 | 性質 | 例 |
 |---|---|---|
-| **堅牢** | 単一文字のマッチ。Str がどれだけ細分化されても、どこかの Str 片に必ず残る | `char-format` の `Str` パス（`§`/`′`/`″`/`(`/`)`） |
+| **堅牢** | 単一文字のマッチ。Str がどれだけ細分化されても、どこかの Str 片に必ず残る | `str_rules` の `Str` パス（`§`/`′`/`″`/`(`/`)`） |
 | **脆弱** | 複数文字のパターンマッチ。単一 Str 内に揃っている必要がある | `ruby` の `｜.-《.-》` |
-| **普通** | コンテナ参照系。Str 分割そのものには強いが、`pandoc.utils.stringify` を呼ぶと RawInline の中身が落ちる | `char-format` の `Strong` パス（内部で stringify） |
+| **普通** | コンテナ参照系。Str 分割そのものには強いが、`pandoc.utils.stringify` を呼ぶと RawInline の中身が落ちる | `str_rules` の `Strong` パス（内部で stringify） |
 
 ## 軸 2：出力礼儀
 
@@ -39,11 +39,11 @@ pandoc Lua フィルターを複数組み合わせるとき、フィルター同
 
 同様に、`ruby` の `text:match('(.-)｜(.-)《(.-)》(.*)')` は単一 Str 内に完全パターンがある前提なので、先に Str が分割されているとマッチ不能になりルビ未変換になる。
 
-この事故は、両者を `char-format.lua` に統合して `{ Strong = ... }` → `{ Str = ... }` の 2 パスに固定したことで構造的に起きなくなった。`Strong` パスは `stringify` した文字列を自前で run 分割するので、傍点の中でも § は保たれる。
+この事故は、両者を `str_rules.lua` に統合して `{ Strong = ... }` → `{ Str = ... }` の 2 パスに固定したことで構造的に起きなくなった。`Strong` パスは `stringify` した文字列を自前で run 分割するので、傍点の中でも § は保たれる。
 
 ## 循環依存：傍点 ↔ ruby
 
-`char-format` の `Strong` パスと `ruby` は互いに「自分が先に動きたい」要求を持つ：
+`str_rules` の `Strong` パスと `ruby` は互いに「自分が先に動きたい」要求を持つ：
 
 - `ruby` は傍点が先だと困る（傍点が `Strong → RawInline` 変換で中身を消す）
 - 傍点は `ruby` が先だと困る（`ruby` が `Str → RawInline` 化、`stringify` で中身が消える）
