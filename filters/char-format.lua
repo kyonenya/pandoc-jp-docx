@@ -1,24 +1,18 @@
--- Word の文字書式（OOXML の w:rPr）を指定した run を組み立てる
--- 1. 傍点 (w:em): 日本語を含む **強調** を丸傍点にする
--- 2. 半角幅の固定 (w:rFonts): Ambiguous 文字を半角で表示させる
--- 3. 和欧間アキ (w:spacing): 記号が挟まると Word が入れてくれないアキを補う
+-- Word の文字書式 (OOXML の w:rPr) を指定した run (w:r) を組み立てる
+-- 1. 傍点: 日本語を含む **強調** を丸傍点にする
+-- 2. 半角幅の固定: Ambiguous 文字を半角幅で表示させる
+-- 3. 和欧間アキ: 記号が挟まると Word が入れてくれないアキを補う
 
 local xml = {
-  boten = '<w:em w:val="dot"/>', -- 丸傍点。ゴマ傍点は "comma"
+  boten = '<w:em w:val="dot"/>', -- 丸傍点（ゴマ傍点は "comma"）
   half_width = '<w:rFonts w:hint="default"/>',
-  spacing = '<w:spacing w:val="44"/>', -- 和欧間アキ 2.2pt
+  spacing = '<w:spacing w:val="44"/>', -- 和欧間アキ2.2pt
 }
 
 local rules = {
-  spacing = {
-    ['′'] = true, ['″'] = true, ['‴'] = true, ['('] = true, [')'] = true,
-  },
   half_width = { ['§'] = true, ['′'] = true, ['″'] = true, ['‴'] = true },
+  spacing = { ['′'] = true, ['″'] = true, ['‴'] = true, ['('] = true, [')'] = true, },
 }
-
-local function escape_xml(s)
-  return (s:gsub('&', '&amp;'):gsub('<', '&lt;'):gsub('>', '&gt;'))
-end
 
 local function is_japanese(char)
   local c = utf8.codepoint(char)
@@ -33,20 +27,21 @@ local function contains_japanese(text)
   return false
 end
 
--- 文字の境界にアキが要るか。記号が挟まると Word の自動アキが効かないので補う
--- w:spacing は run 内の各文字の後ろに入るので、呼び出し側は左の文字に付ける
-local function needs_spacing(left, right)
-  if left == nil or right == nil then return false end
-  return (rules.spacing[left] and is_japanese(right)) -- 記号 → 和文
-      or (is_japanese(left) and rules.spacing[right]) -- 和文 → 記号
+-- 自身の後続する文字との境界にアキが要るかどうか
+local function needs_spacing(char, next_char)
+  if next_char == nil then return false end
+  return (rules.spacing[char] and is_japanese(next_char)) -- 記号 → 和文
+      or (is_japanese(char) and rules.spacing[next_char]) -- 和文 → 記号
 end
 
--- text -> [{ text, rpr }]
-local function split_runs(text)
+-- 半角幅固定と和欧間アキ補正
+local function split_runs(text) --> [{ text, rpr }] | nil
   local chars = {}
   for char in text:gmatch(utf8.charpattern) do chars[#chars + 1] = char end
 
-  local runs, plain = pandoc.List(), ''
+  local runs = pandoc.List()
+  local plain = ''
+
   local function flush()
     if plain ~= '' then runs:insert({ text = plain, rpr = '' }) end
     plain = ''
@@ -64,21 +59,29 @@ local function split_runs(text)
     end
   end
 
-  if #runs == 0 then return nil end -- 対象文字なし。plain を flush する前に判定する
+  -- 置換対象の文字がなかった場合
+  if #runs == 0 then return nil end -- plain を flush する前に判定する
+
   flush()
   return runs
 end
 
+local function escape_xml(s)
+  return (s:gsub('&', '&amp;'):gsub('<', '&lt;'):gsub('>', '&gt;'))
+end
+
 local function make_run(rpr, text)
   return string.format(
-    '<w:r><w:rPr>%s</w:rPr><w:t xml:space="preserve">%s</w:t></w:r>',
+       '<w:r>' -- run
+      .. '<w:rPr>%s</w:rPr>' -- rpr (run properties)
+      .. '<w:t xml:space="preserve">%s</w:t>' -- text
+    .. '</w:r>',
     rpr, escape_xml(text)
   )
 end
 
 return {
   {
-    -- 傍点。ruby.lua より先に処理する必要がある
     Strong = function(elem)
       if FORMAT ~= 'docx' then return nil end
 
@@ -86,13 +89,13 @@ return {
       if not contains_japanese(text) then return nil end
 
       local runs = split_runs(text) or pandoc.List({ { text = text, rpr = '' } })
+
       return runs:map(function(run)
         return pandoc.RawInline('openxml', make_run(run.rpr .. xml.boten, run.text))
       end)
     end,
   },
   {
-    -- 半角幅の固定とアキ補正
     Str = function(elem)
       if FORMAT ~= 'docx' then return nil end
 
