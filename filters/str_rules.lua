@@ -29,11 +29,12 @@ end
 
 local function needs_spacing(char, next_char)
   if next_char == nil then return false end
-  return (rules.spacing[char] and is_japanese(next_char)) -- 記号 → 和文
-      or (is_japanese(char) and rules.spacing[next_char]) -- 和文 → 記号
+  return (rules.spacing[char] and is_japanese(next_char))
+      or (is_japanese(char) and rules.spacing[next_char])
 end
 
-local function split_runs_by_rules(text) --> [{ text, rpr }]
+-- text -> [{text}, {text, rpr}, {text}]
+local function split_runs_by_rules(text)
   local chars = {}
   for char in text:gmatch(utf8.charpattern) do chars[#chars + 1] = char end
 
@@ -45,7 +46,7 @@ local function split_runs_by_rules(text) --> [{ text, rpr }]
     local last = runs[#runs]
 
     if rpr == '' and last and last.rpr == '' then
-      last.text = last.text .. char -- 直前の書式なし run に続ける
+      last.text = last.text .. char -- append to last plaintext
     else
       runs:insert({ text = char, rpr = rpr })
     end
