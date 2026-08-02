@@ -29,8 +29,8 @@ local function is_japanese(char)
 end
 
 local function contains_japanese(text)
-  for _, code in utf8.codes(text) do
-    if is_japanese(utf8.char(code)) then return true end
+  for char in text:gmatch(utf8.charpattern) do
+    if is_japanese(char) then return true end
   end
   return false
 end
@@ -45,7 +45,7 @@ end
 -- text -> [{ text, rpr }] / 対象文字がなければ nil
 local function split_runs(text)
   local chars = {}
-  for _, code in utf8.codes(text) do chars[#chars + 1] = utf8.char(code) end
+  for char in text:gmatch(utf8.charpattern) do chars[#chars + 1] = char end
 
   local runs, plain = pandoc.List(), ''
   local function flush()
@@ -55,15 +55,16 @@ local function split_runs(text)
 
   for i, char in ipairs(chars) do
     local hint = rules[char] -- nil なら対象外、false なら hint 指定なし
-    local prev = chars[i - 1]
-    local rpr = (hint and string.format('<w:rFonts w:hint="%s"/>', hint) or '')
-      .. (hint ~= nil and chars[i + 1] and is_japanese(chars[i + 1]) and spacing or '')
+    local next_char = chars[i + 1]
+    local rpr = ''
 
-    -- 左隣が和文なら、その 1 文字を別 run に切り出してアキを付ける
-    if hint ~= nil and prev and is_japanese(prev) then
-      plain = plain:sub(1, #plain - #prev)
-      flush()
-      runs:insert({ text = prev, rpr = east_asia .. spacing })
+    if hint ~= nil then
+      -- 対象文字。右隣が和文ならアキを付ける
+      rpr = (hint and string.format('<w:rFonts w:hint="%s"/>', hint) or '')
+        .. (next_char and is_japanese(next_char) and spacing or '')
+    elseif next_char and rules[next_char] ~= nil and is_japanese(char) then
+      -- 対象文字の左隣の和文。この 1 文字だけ別 run に切り出してアキを付ける
+      rpr = east_asia .. spacing
     end
 
     if rpr == '' then
@@ -74,7 +75,7 @@ local function split_runs(text)
     end
   end
 
-  if #runs == 0 then return nil end
+  if #runs == 0 then return nil end -- 対象文字なし。plain を flush する前に判定する
   flush()
   return runs
 end
