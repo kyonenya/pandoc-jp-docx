@@ -5,7 +5,6 @@
 
 local boten = '<w:em w:val="dot"/>' -- 丸傍点。ゴマ傍点は "comma"
 local spacing = '<w:spacing w:val="44"/>' -- 和欧間アキ 2.2pt
-local east_asia = '<w:rFonts w:hint="eastAsia"/>'
 
 -- 対象文字 -> 半角幅を固定する hint（false は hint 指定なし）
 local rules = {
@@ -64,7 +63,6 @@ local function split_runs(text)
     -- w:spacing は run 内の各文字の「後ろ」に入るので、境界の左側の文字に付ける
     local gap = needs_spacing(char, chars[i + 1])
     local rpr = (hint and string.format('<w:rFonts w:hint="%s"/>', hint) or '')
-      .. (gap and hint == nil and east_asia or '') -- 記号の左隣の和文。切り出すので hint を明示
       .. (gap and spacing or '')
 
     if rpr == '' then
