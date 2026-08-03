@@ -179,6 +179,7 @@ HTML で見たい場合は、libgrapheme のミラーが行単位で読みやす
 
 ## 参考資料
 
+- [Ambiguous Width文字の一覧](https://emonkak.pages.dev/articles/wcwidth/ambiguous_width_characters.txt)
 - [UAX #11: East Asian Width](https://www.unicode.org/reports/tr11/) — Ambiguous 分類の規範定義
 - [MS-OE376 §2.3.2.24 rFonts (Run Fonts)](https://learn.microsoft.com/en-us/openspecs/office_standards/ms-oe376/dcf1caba-49a9-40e3-ba36-32b9e205434f) — `<w:rFonts>` 仕様
 - [ST_Hint (Font Type Hint)](https://c-rex.net/samples/ooxml/e1/Part4/OOXML_P4_DOCX_ST_Hint_topic_ID0EHEZ2.html) — `w:hint` 列挙値の定義
