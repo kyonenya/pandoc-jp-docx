@@ -1,16 +1,18 @@
 -- Word の文字書式 (OOXML の w:rPr) を指定して run (w:r) を組み立てる
 -- 1. 傍点: 日本語を含む **強調** を傍点にする
--- 2. 半角幅の固定: Ambiguous 文字を半角幅で表示させる
+-- 2. 表示幅の固定: Ambiguous 文字を半角幅または全角幅で表示させる
 -- 3. 和欧間アキ: 記号が挟まると Word が入れてくれないアキを補う
 
 local rules = {
   half_width = { ['§'] = true, ['′'] = true, ['″'] = true, ['‴'] = true },
+  full_width = { ['Ⅰ'] = true, ['Ⅱ'] = true, ['Ⅲ'] = true, ['Ⅳ'] = true, ['Ⅴ'] = true, ['Ⅵ'] = true, ['Ⅶ'] = true, ['Ⅷ'] = true, ['Ⅸ'] = true, ['Ⅹ'] = true, ['Ⅺ'] = true, ['Ⅻ'] = true },
   spacing = { ['′'] = true, ['″'] = true, ['‴'] = true, ['('] = true, [')'] = true, },
 }
 
 local xml = {
   boten = '<w:em w:val="dot"/>', -- 丸傍点（ゴマ傍点は "comma"）
   half_width = '<w:rFonts w:hint="default"/>',
+  full_width = '<w:rFonts w:hint="eastAsia"/>',
   spacing = '<w:spacing w:val="44"/>', -- 2.2pt
 }
 
@@ -42,6 +44,7 @@ local function split_runs_by_rules(text)
 
   for i, char in ipairs(chars) do
     local rpr = (rules.half_width[char] and xml.half_width or '')
+      .. (rules.full_width[char] and xml.full_width or '')
       .. (needs_spacing(char, chars[i + 1]) and xml.spacing or '')
     local last = runs[#runs]
 
