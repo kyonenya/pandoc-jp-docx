@@ -4,7 +4,7 @@
 -- 3. 和欧間アキ: 記号が挟まると Word が入れてくれないアキを補う
 
 local rules = {
-  half_width = { ['§'] = true, ['′'] = true, ['″'] = true, ['‴'] = true },
+  half_width = { ['§'] = true, ['′'] = true, ['″'] = true, ['‴'] = true, ['∥'] = true },
   full_width = { ['Ⅰ'] = true, ['Ⅱ'] = true, ['Ⅲ'] = true, ['Ⅳ'] = true, ['Ⅴ'] = true, ['Ⅵ'] = true, ['Ⅶ'] = true, ['Ⅷ'] = true, ['Ⅸ'] = true, ['Ⅹ'] = true, ['Ⅺ'] = true, ['Ⅻ'] = true },
   spacing = { ['′'] = true, ['″'] = true, ['‴'] = true, ['('] = true, [')'] = true, },
 }
