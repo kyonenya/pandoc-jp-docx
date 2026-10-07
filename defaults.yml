@@ -1,7 +1,7 @@
 standalone: true
 to: docx
-reference-doc: reference.docx
+reference-doc: ${.}/reference.docx
 filters:
-  - filters/str_rules.lua
-  - filters/ruby.lua
-  - filters/breaks.lua
+  - ${.}/filters/str_rules.lua
+  - ${.}/filters/ruby.lua
+  - ${.}/filters/breaks.lua

@@ -12,7 +12,9 @@ jobs:
   no-config:
     uses: kyonenya/pandoc-jp-docx/.github/workflows/docx.yml@dev
     with:
-      input_pattern: sample/[0-9]*.md
+      input_pattern: |
+        sample/1*.md sample/2*.md
+        sample/9*.md
       output_name: no-config
 
   with-config:

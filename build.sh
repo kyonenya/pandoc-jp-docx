@@ -5,6 +5,7 @@ usage="Usage: $0 input_pattern output_path [--defaults=path] [--no-postprocess]"
 
 input_pattern=${1:?"$usage"}
 output_path=${2:?"$usage"}
+script_dir=$(dirname "$0")
 defaults_path=
 postprocess=true
 
@@ -30,19 +31,26 @@ done
 
 mkdir -p "$(dirname "$output_path")"
 
-set -- $input_pattern # expand
+set --
+for path in $input_pattern; do # expand
+  if [ -e "$path" ]; then
+    set -- "$@" "$path"
+  else
+    echo "No input files matched: $path" >&2
+  fi
+done
 
-if [ "$#" -eq 1 ] && [ ! -e "$1" ]; then
-  echo "No input files matched: $input_pattern" >&2
+if [ "$#" -eq 0 ]; then
+  echo "No input files to convert" >&2
   exit 1
 fi
 
 pandoc \
-  --defaults=defaults.yml \
+  --defaults="$script_dir/defaults.yml" \
   ${defaults_path:+--defaults="$defaults_path"} \
   --output="$output_path" \
   "$@"
 
 if [ "$postprocess" = "true" ]; then
-  ./postprocess/numbering.sh "$output_path"
+  "$script_dir/postprocess/numbering.sh" "$output_path"
 fi
