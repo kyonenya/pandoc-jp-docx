@@ -30,10 +30,17 @@ done
 
 mkdir -p "$(dirname "$output_path")"
 
-set -- $input_pattern # expand
+set --
+for path in $input_pattern; do # expand
+  if [ -e "$path" ]; then
+    set -- "$@" "$path"
+  else
+    echo "No input files matched: $path" >&2
+  fi
+done
 
-if [ "$#" -eq 1 ] && [ ! -e "$1" ]; then
-  echo "No input files matched: $input_pattern" >&2
+if [ "$#" -eq 0 ]; then
+  echo "No input files to convert" >&2
   exit 1
 fi
 

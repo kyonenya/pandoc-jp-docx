@@ -41,7 +41,9 @@ sh -n build.sh
 mise exec -- ./build.sh 'sample/[0-9]*.md' dist/with-config.docx --defaults=sample/defaults.yml
 mise exec -- ./build.sh 'sample/[0-9]*.md' dist/sample.docx
 mise exec -- ./build.sh 'sample/[0-9]*.md' dist/no-postprocess.docx --no-postprocess
+mise exec -- ./build.sh 'sample/1*.md sample/2*.md sample/9*.md' dist/multi-pattern.docx
 unzip -t dist/with-config.docx
 unzip -t dist/sample.docx
 unzip -t dist/no-postprocess.docx
+unzip -t dist/multi-pattern.docx
 ```

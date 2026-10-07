@@ -46,6 +46,14 @@ jobs:
           ref: ${{ github.ref }}
           path: caller
 
+      - name: Resolve input pattern
+        id: input
+        env:
+          INPUT_PATTERN: ${{ inputs.input_pattern }}
+        run: |
+          set -f
+          echo "pattern=$(printf 'caller/%s ' $INPUT_PATTERN)" >> "$GITHUB_OUTPUT"
+
       - name: Convert Markdown to DOCX
         id: pandoc
         uses: docker://pandoc/core:latest
@@ -53,7 +61,7 @@ jobs:
           entrypoint: /bin/sh
           args: >-
             build.sh
-            caller/${{ inputs.input_pattern }}
+            "${{ steps.input.outputs.pattern }}"
             caller/dist/${{ inputs.output_name }}.docx
             ${{ inputs.defaults && format('--defaults=caller/{0}', inputs.defaults) || '' }}
             --no-postprocess
