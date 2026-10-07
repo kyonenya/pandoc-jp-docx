@@ -33,26 +33,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout shared workflow files
-        uses: actions/checkout@v6
-        with:
-          repository: ${{ job.workflow_repository }}
-          ref: ${{ job.workflow_sha }}
-
       - name: Checkout caller repository
         uses: actions/checkout@v6
         with:
           repository: ${{ github.repository }}
           ref: ${{ github.ref }}
-          path: caller
 
-      - name: Resolve input pattern
-        id: input
-        env:
-          INPUT_PATTERN: ${{ inputs.input_pattern }}
-        run: |
-          set -f
-          echo "pattern=$(printf 'caller/%s ' $INPUT_PATTERN)" >> "$GITHUB_OUTPUT"
+      - name: Checkout shared workflow files
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ job.workflow_repository }}
+          ref: ${{ job.workflow_sha }}
+          path: .pandoc-jp-docx
 
       - name: Convert Markdown to DOCX
         id: pandoc
@@ -60,14 +52,14 @@ jobs:
         with:
           entrypoint: /bin/sh
           args: >-
-            build.sh
-            "${{ steps.input.outputs.pattern }}"
-            caller/dist/${{ inputs.output_name }}.docx
-            ${{ inputs.defaults && format('--defaults=caller/{0}', inputs.defaults) || '' }}
+            .pandoc-jp-docx/build.sh
+            "${{ inputs.input_pattern }}"
+            dist/${{ inputs.output_name }}.docx
+            ${{ inputs.defaults && format('--defaults={0}', inputs.defaults) || '' }}
             --no-postprocess
 
       - name: Fix generated file ownership
-        run: sudo chown -R "$USER:$USER" caller/dist
+        run: sudo chown -R "$USER:$USER" dist
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -75,7 +67,7 @@ jobs:
           node-version: 26
 
       - name: Postprocess DOCX numbering
-        run: ./postprocess/numbering.sh "caller/dist/${{ inputs.output_name }}.docx"
+        run: .pandoc-jp-docx/postprocess/numbering.sh "dist/${{ inputs.output_name }}.docx"
 
       - name: Convert DOCX to PDF
         if: ${{ inputs.pdf }}
@@ -84,7 +76,7 @@ jobs:
           MS_CLIENT_ID: ${{ secrets.ms_client_id }}
           MS_REFRESH_TOKEN: ${{ secrets.ms_refresh_token }}
           MS_REFRESH_TOKEN_OUTPUT_PATH: ${{ runner.temp }}/ms-refresh-token
-        run: node ./postprocess/pdf.mts "caller/dist/${{ inputs.output_name }}.docx" "caller/dist/${{ inputs.output_name }}.pdf"
+        run: node .pandoc-jp-docx/postprocess/pdf.mts "dist/${{ inputs.output_name }}.docx" "dist/${{ inputs.output_name }}.pdf"
 
       - name: Update Microsoft refresh token
         if: ${{ inputs.pdf }}
@@ -105,7 +97,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cd caller/dist
+          cd dist
 
           git init -b "${{ github.ref_name }}_pandoc-${{ inputs.output_name }}"
           git config user.name "github-actions[bot]"

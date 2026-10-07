@@ -14,7 +14,7 @@
 - `build.sh` はローカルと GitHub Actions の共通処理である。Pandoc 実行と `postprocess/numbering.sh` の実行をここに集約する。
 - `build.sh` の引数順は `input_pattern output_path [--defaults=path] [--no-postprocess]` である。`output_path` は必須であり、`defaults` は任意である。
 - `--no-postprocess` を指定すると `postprocess/numbering.sh` を実行しない。
-- workflow 側は `output_name` から `caller/dist/<output_name>.docx` を組み立て、`build.sh` へ渡す。
+- workflow 側は呼び出し側リポジトリをワークスペース直下に、このリポジトリを `.pandoc-jp-docx/` に checkout する。`build.sh` と `defaults.yml` は、自分の置き場所を基準に共有側のファイルを参照する。
 - `postprocess/pdf.mts` で、Microsoft Graph API を使って DOCX を PDF に変換する。
   - エラー時も best-effort で処理を継続し、生成できた PDF や、あるいは DOCX だけでも成果物ブランチへの公開を続行する。
 - `get-refresh-token.sh` で PDF 変換用の初回のリフレッシュトークンを取得する。
