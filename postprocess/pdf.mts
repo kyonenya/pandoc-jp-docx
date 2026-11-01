@@ -125,8 +125,8 @@ async function main(
     try {
       await ok(
         graphRequest(
-          `/me/drive/items/${encodeURIComponent(itemId)}`,
-          { method: 'DELETE' },
+          `/me/drive/items/${encodeURIComponent(itemId)}/permanentDelete`,
+          { method: 'POST' },
           access_token,
         ),
         'delete the uploaded DOCX',
