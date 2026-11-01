@@ -16,10 +16,11 @@ async function ok(
   } | null = await response.json().catch(() => null);
   const message =
     body?.error_description ??
-    (typeof body?.error === 'string' ? body.error : body?.error?.message) ??
-    `HTTP ${response.status}`;
+    (typeof body?.error === 'string' ? body.error : body?.error?.message);
 
-  throw new Error(`Failed to ${operation}: ${message}`);
+  throw new Error(
+    `Failed to ${operation} (HTTP ${response.status})${message ? `: ${message}` : ''}`,
+  );
 }
 
 async function json<T>(
